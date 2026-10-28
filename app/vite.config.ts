@@ -19,8 +19,8 @@ export default defineConfig({
         name: '8Domains',
         short_name: '8Domains',
         description: 'Free, offline study feed for the CISSP® exam: concepts, flashcards, scenario questions.',
-        theme_color: '#0b0a10',
-        background_color: '#0b0a10',
+        theme_color: '#0c0a10',
+        background_color: '#0c0a10',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '.',
@@ -32,7 +32,7 @@ export default defineConfig({
       },
       workbox: {
         // Only the latin subsets of the fonts are precached; other subsets load on demand.
-        globPatterns: ['**/*.{js,css,html,svg,json,webmanifest}', 'assets/*-latin-wght-normal-*.woff2'],
+        globPatterns: ['**/*.{js,css,html,svg,json,webmanifest}', 'assets/*-latin-wght-normal-*.woff2', 'assets/spectral-latin-*.woff2'],
         // kb files are fetched as kb/<file>?v=<version>; the precache entry is revisioned already.
         ignoreURLParametersMatching: [/^v$/],
         navigateFallback: 'index.html',

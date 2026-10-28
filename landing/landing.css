@@ -1,8 +1,8 @@
 /* Same palette as the app (app/src/index.css); fonts are copied next to this file at build time. */
 @font-face {
-  font-family: 'Bricolage Grotesque';
-  src: url('/fonts/bricolage-grotesque-latin-wght-normal.woff2') format('woff2-variations');
-  font-weight: 200 800;
+  font-family: 'Spectral';
+  src: url('/fonts/spectral-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
   font-display: swap;
 }
 @font-face {
@@ -53,7 +53,7 @@ footer {
 h1,
 h2,
 h3 {
-  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Spectral', Georgia, serif;
   line-height: 1.15;
   margin: 0 0 0.5rem;
 }

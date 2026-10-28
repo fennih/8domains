@@ -129,7 +129,7 @@ export function Me({ kb }: { kb: Kb }) {
             onClick={() => void updateSettings({ animations: !state.settings.animations })}
             className={`relative h-7 w-12 rounded-full border border-line transition-colors ${state.settings.animations ? 'bg-accent' : 'bg-surface-2'}`}
           >
-            <span className={`absolute top-0.5 h-5.5 w-5.5 rounded-full bg-surface shadow transition-all ${state.settings.animations ? 'left-[1.4rem]' : 'left-0.5'}`} />
+            <span className={`absolute top-0.5 h-5.5 w-5.5 rounded-full border border-line bg-surface transition-all ${state.settings.animations ? 'left-[1.4rem]' : 'left-0.5'}`} />
           </button>
         </div>
       </section>

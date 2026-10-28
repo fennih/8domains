@@ -11,7 +11,7 @@ function resolve(theme: Theme): 'dark' | 'light' {
 function set(theme: Theme) {
   const resolved = resolve(theme)
   document.documentElement.dataset.theme = resolved
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'light' ? '#f6f4fb' : '#0b0a10')
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'light' ? '#f5f6fa' : '#0c0a10')
 }
 
 // Applies the theme and keeps following the OS setting while on "system". Returns a cleanup.

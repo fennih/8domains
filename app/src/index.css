@@ -2,68 +2,77 @@
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
-/* Dark-first identity: near-black with violet, flat surfaces, crisp borders, jewel-tone domain accents. */
+/* D+: near-black, an editorial serif and jewel tones per domain. Flat surfaces, no glow. */
 :root,
 [data-theme='dark'] {
   color-scheme: dark;
-  --c-bg: #0b0a10;
-  --c-surface: #13111b;
-  --c-surface-2: #1b1826;
-  --c-border: #2a2538;
-  --c-text: #f1edf9;
-  --c-muted: #9b93b0;
-  --c-accent: #b18cff;
-  --c-accent-strong: #8a5cff;
-  --c-accent-fg: #0b0a10;
-  --c-success: #7cf0b4;
+  --c-bg: #0c0a10;
+  --c-surface: #141119;
+  --c-surface-2: #1c1823;
+  --c-border: #2a2433;
+  --c-text: #f2eef7;
+  --c-text-2: #c3bbd2;
+  --c-muted: #a097b0;
+  --c-accent: #b28cff;
+  --c-accent-strong: #9b6cff;
+  --c-accent-fg: #0c0a10;
+  --c-success: #7ce6b0;
   --c-danger: #ff8f8f;
   --c-warn: #f5dc6e;
   --c-ok-soft: color-mix(in oklab, var(--c-success) 13%, var(--c-surface));
   --c-bad-soft: color-mix(in oklab, var(--c-danger) 13%, var(--c-surface));
-  --glow: 0.55;
 
-  --d1: #b18cff;
-  --d2: #ff7ad9;
-  --d3: #6ee7d8;
-  --d4: #ffb86b;
-  --d5: #8fa8ff;
-  --d6: #c6f36b;
-  --d7: #ff8f8f;
-  --d8: #f5dc6e;
+  --d1: #b28cff;
+  --d2: #f5a8cd;
+  --d3: #3fcf98;
+  --d4: #6e98ff;
+  --d5: #f3b65c;
+  --d6: #79d8ee;
+  --d7: #ff6f86;
+  --d8: #ecd36a;
 
-  --hl-y: #ecff74;
-  --hl-g: #9ef5d2;
-  --hl-b: #cdb8ff;
-  --ul: #ff7ad9;
+  /* Highlighters carry meaning (content/AUTHORING.md): yellow fact, mint exam action, blue numbers. */
+  --hl-y: #fff1a0;
+  --hl-g: #a8f0c8;
+  --hl-b: #a8d8ff;
+  --ul: var(--c-accent);
   /* Text on a highlighter stroke is always dark, in both themes. */
   --hl-fg: #15121c;
 }
 
+/* Cool light theme: the same hues deepened to AA on white, never cream. */
 [data-theme='light'] {
   color-scheme: light;
-  --c-bg: #f6f4fb;
+  --c-bg: #f5f6fa;
   --c-surface: #ffffff;
-  --c-surface-2: #efebf8;
-  --c-border: #e3ddf0;
+  --c-surface-2: #eceef5;
+  --c-border: #dfe1ea;
   --c-text: #15121c;
-  --c-muted: #5d5570;
-  --c-accent: #7c4dff;
-  --c-accent-strong: #6a35f5;
+  --c-text-2: #433d52;
+  --c-muted: #5a5468;
+  --c-accent: #6f3fe0;
+  --c-accent-strong: #5b2fc9;
   --c-accent-fg: #ffffff;
   --c-success: #11805a;
   --c-danger: #c8323a;
   --c-warn: #8a6d00;
-  --glow: 0.22;
 
-  /* Same hues, deepened so text and thin lines keep AA contrast on white. */
-  --d1: #7c4dff;
-  --d2: #c21f97;
-  --d3: #0e8478;
-  --d4: #b35c00;
-  --d5: #3f5bd8;
-  --d6: #4f7a00;
-  --d7: #cc3d3d;
-  --d8: #8a6d00;
+  --d1: #6f3fe0;
+  --d2: #b3306c;
+  --d3: #1c7754;
+  --d4: #2f5bd0;
+  --d5: #8f5c0c;
+  --d6: #14708a;
+  --d7: #bf2d49;
+  --d8: #786511;
+
+  --hl-y: #ffe27a;
+  --hl-g: #8fe6b5;
+  --hl-b: #90c8ff;
+}
+
+@theme {
+  --breakpoint-desk: 75rem;
 }
 
 @theme inline {
@@ -72,6 +81,7 @@
   --color-surface-2: var(--c-surface-2);
   --color-line: var(--c-border);
   --color-fg: var(--c-text);
+  --color-fg-2: var(--c-text-2);
   --color-muted: var(--c-muted);
   --color-accent: var(--c-accent);
   --color-accent-fg: var(--c-accent-fg);
@@ -84,8 +94,10 @@
   --color-dc: var(--dc);
   --color-dc-ink: var(--dc-ink);
   --color-dc-soft: var(--dc-soft);
+  --color-dc-tint: var(--dc-tint);
+  --color-dc-edge: var(--dc-edge);
   --font-sans: 'Atkinson Hyperlegible Next Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Spectral', Georgia, 'Times New Roman', serif;
 }
 
 :root {
@@ -113,7 +125,10 @@ h2,
 h3,
 .font-display {
   font-family: var(--font-display);
+  font-weight: 400;
   letter-spacing: -0.01em;
+  /* Spectral ships 400 and 500 only: bold requests render as 500 instead of a faux bold. */
+  font-synthesis-weight: none;
 }
 
 :focus-visible {
@@ -133,7 +148,7 @@ strong {
   font-weight: 700;
 }
 
-/* Domain accents: --dc is the jewel tone, --dc-ink the text color, --dc-soft a faint tint. Used as lines and glows, not fills. */
+/* Domain gems: --dc is the jewel tone; tint, edge and track are fixed mixes of it (7%, 30%, 22%). */
 .d-1 { --dc: var(--d1); }
 .d-2 { --dc: var(--d2); }
 .d-3 { --dc: var(--d3); }
@@ -153,7 +168,10 @@ strong {
 .d-7,
 .d-8 {
   --dc-ink: var(--dc);
-  --dc-soft: color-mix(in oklab, var(--dc) 12%, var(--c-surface));
+  --dc-soft: color-mix(in srgb, var(--dc) 12%, var(--c-surface));
+  --dc-tint: color-mix(in srgb, var(--dc) 7%, transparent);
+  --dc-edge: color-mix(in srgb, var(--dc) 30%, transparent);
+  --dc-track: color-mix(in srgb, var(--dc) 22%, transparent);
 }
 
 .chip-domain {
@@ -163,38 +181,32 @@ strong {
 }
 
 .card {
-  background: var(--c-surface);
-  border: 1px solid color-mix(in oklab, var(--dc) 28%, var(--c-border));
-  border-radius: 1.5rem;
-  box-shadow:
-    inset 0 2px 0 0 var(--dc),
-    0 0 48px -24px color-mix(in oklab, var(--dc) calc(var(--glow) * 100%), transparent);
+  background: color-mix(in srgb, var(--dc) 8%, var(--c-bg));
+  border: 1px solid var(--dc-edge);
+  border-radius: 18px;
 }
 
 .tile {
-  background: var(--c-surface);
-  border: 1px solid color-mix(in oklab, var(--dc) 35%, var(--c-border));
-  border-radius: 1.25rem;
-  transition: border-color 150ms, box-shadow 150ms;
+  background: var(--dc-tint);
+  border: 1px solid var(--dc-edge);
+  border-radius: 12px;
+  transition: border-color 150ms;
 }
 .tile:hover,
 .tile:focus-visible {
   border-color: var(--dc);
-  box-shadow: 0 0 28px -10px color-mix(in oklab, var(--dc) calc(var(--glow) * 100%), transparent);
 }
 
 .bar-domain {
   background: var(--dc);
-  box-shadow: 0 0 10px -2px color-mix(in oklab, var(--dc) calc(var(--glow) * 100%), transparent);
 }
 
 /* Story progress: one segment per tap. */
 .seg {
-  background: var(--c-surface-2);
+  background: var(--dc-track);
 }
 .seg-on {
   background: var(--dc);
-  box-shadow: 0 0 8px -1px color-mix(in oklab, var(--dc) calc(var(--glow) * 100%), transparent);
 }
 
 /* Bullets: domain-colored dot, sub-bullets indented with a thin dash. */
@@ -219,7 +231,6 @@ strong {
   height: 0.42em;
   border-radius: 999px;
   background: var(--dc, var(--c-accent));
-  box-shadow: 0 0 8px color-mix(in oklab, var(--dc, var(--c-accent)) calc(var(--glow) * 100%), transparent);
 }
 .bl-sub {
   display: flex;
@@ -228,7 +239,7 @@ strong {
   list-style: none;
   margin: 0.5em 0 0;
   padding: 0;
-  color: var(--c-muted);
+  color: var(--c-text-2);
 }
 .bl-sub > li {
   position: relative;
@@ -241,7 +252,7 @@ strong {
   top: 0.68em;
   width: 0.55em;
   height: 1.5px;
-  background: color-mix(in oklab, var(--dc, var(--c-accent)) 80%, transparent);
+  background: var(--c-text-2);
 }
 
 /* Highlighter: a marker stroke drawn as SVG. Fixed-width chisel ends plus a stretching middle keep the slant
@@ -419,7 +430,6 @@ strong {
   border-color: var(--dc);
   background: var(--dc);
   color: var(--c-accent-fg);
-  box-shadow: 0 0 14px -3px color-mix(in oklab, var(--dc) calc(var(--glow) * 100%), transparent);
 }
 [data-theme='light'] .cell-mastered {
   color: #ffffff;
