@@ -13,7 +13,7 @@ export function StreakBadge() {
   const { state } = useProgress()
   const n = streak(state, new Date())
   return (
-    <span className="shrink-0 self-start whitespace-nowrap rounded-full border border-line px-2.5 py-1 text-xs font-bold text-muted" title="Days in a row with some study">
+    <span className="shrink-0 whitespace-nowrap rounded-full border border-line px-2.5 py-1 text-xs font-bold text-muted" title="Days in a row with some study">
       {n > 0 ? `${n}-day streak` : 'No streak yet'}
     </span>
   )

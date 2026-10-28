@@ -124,7 +124,7 @@ function ScopeChip({ kb, scope, onClick }: { kb: Kb; scope: Scope; onClick: () =
       <span aria-hidden="true">&larr;</span>
       <span data-testid="scope-chip">{text}</span>
       {total > 0 && (
-        <span className="h-1.5 w-12 overflow-hidden rounded-full bg-surface/70" aria-hidden="true">
+        <span className="h-1.5 w-12 overflow-hidden rounded-full bg-[var(--dc-track)]" aria-hidden="true">
           <span className="bar-domain block h-full rounded-full" style={{ width: `${Math.round((done / total) * 100)}%` }} />
         </span>
       )}
