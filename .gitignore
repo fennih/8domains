@@ -17,3 +17,7 @@ dist/
 .env.*
 .DS_Store
 app/public/kb/
+
+# Cloudflare Workers
+.dev.vars
+.wrangler/

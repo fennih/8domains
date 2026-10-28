@@ -1,41 +1,16 @@
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// Served under /app/ in production (see Makefile); the Worker sets CSP and other headers.
 const base = process.env.BASE_PATH ?? '/'
-
-const CSP = [
-  "default-src 'self'",
-  "script-src 'self'",
-  "style-src 'self'",
-  "img-src 'self' data:",
-  "connect-src 'self'",
-  "worker-src 'self'",
-  "manifest-src 'self'",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'none'",
-].join('; ')
-
-function cspMeta(): Plugin {
-  return {
-    name: 'csp-meta',
-    apply: 'build',
-    transformIndexHtml(html) {
-      const charset = '<meta charset="UTF-8" />'
-      if (!html.includes(charset)) throw new Error('csp-meta: charset meta not found in index.html')
-      return html.replace(charset, `${charset}\n    <meta http-equiv="Content-Security-Policy" content="${CSP}" />`)
-    },
-  }
-}
 
 export default defineConfig({
   base,
   plugins: [
     react(),
     tailwindcss(),
-    cspMeta(),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'script',

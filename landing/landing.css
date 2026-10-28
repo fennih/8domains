@@ -1,0 +1,139 @@
+/* Same palette as the app (app/src/index.css); fonts are copied next to this file at build time. */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/fonts/bricolage-grotesque-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('/fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  --bg: #0b0a10;
+  --surface: #13111b;
+  --border: #2a2538;
+  --text: #f1edf9;
+  --muted: #9b93b0;
+  --accent: #b18cff;
+  --accent-fg: #0b0a10;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+    --bg: #f6f4fb;
+    --surface: #ffffff;
+    --border: #e3ddf0;
+    --text: #15121c;
+    --muted: #5d5570;
+    --accent: #7c4dff;
+    --accent-fg: #ffffff;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.6 'Atkinson Hyperlegible Next', ui-sans-serif, system-ui, sans-serif;
+}
+main,
+footer {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+h1,
+h2,
+h3 {
+  font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.15;
+  margin: 0 0 0.5rem;
+}
+h1 {
+  font-size: clamp(2.5rem, 8vw, 3.5rem);
+}
+h2 {
+  font-size: 1.5rem;
+}
+h3 {
+  font-size: 1.1rem;
+}
+a {
+  color: var(--accent);
+}
+
+.hero {
+  padding: 18vh 0 4rem;
+}
+.lead {
+  font-size: 1.25rem;
+  margin: 0 0 1.5rem;
+}
+.note {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.btn {
+  display: inline-block;
+  padding: 0.7rem 1.4rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+.btn:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+section {
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+.cards li {
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+.cards p {
+  margin: 0;
+  color: var(--muted);
+}
+.steps {
+  padding-left: 1.25rem;
+}
+
+footer {
+  padding-top: 2rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  color: var(--muted);
+  font-size: 0.85rem;
+}

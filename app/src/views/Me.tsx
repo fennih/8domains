@@ -1,6 +1,8 @@
 import { useMemo, useRef, useState } from 'react'
 import type { Kb } from '../kb/types'
+import { Account } from '../components/Account'
 import { Label } from '../components/Chips'
+import { AUTH_ENABLED } from '../lib/auth'
 import { MAX_IMPORT_BYTES, serializeBackup } from '../lib/backup'
 import { addDays, startOfDay, toIsoDate } from '../lib/dates'
 import type { Theme } from '../lib/db'
@@ -162,9 +164,11 @@ export function Me({ kb }: { kb: Kb }) {
         )}
       </section>
 
+      {AUTH_ENABLED && <Account />}
+
       <footer className="mt-auto flex flex-col gap-1 pb-2 text-xs text-muted">
         <p>Content version {kb.version} · ISC2 outline {kb.outline.outlineVersion}</p>
-        <p>Open source. No account, no tracking. CISSP® is a registered certification mark of ISC2, Inc.; 8Domains is not affiliated with or endorsed by ISC2.</p>
+        <p>Open source. No ads, no tracking. CISSP® is a registered certification mark of ISC2, Inc.; 8Domains is not affiliated with or endorsed by ISC2.</p>
       </footer>
     </div>
   )
