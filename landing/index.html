@@ -3,63 +3,190 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="8Domains: a free, open source study feed for the CISSP® exam. Concepts, flashcards with spaced repetition and scenario questions across the eight domains." />
-    <meta name="theme-color" content="#0b0a10" />
-    <meta name="referrer" content="no-referrer" />
-    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/landing.css" />
     <title>8Domains: a CISSP study feed</title>
+    <meta name="description" content="8Domains: a free, open source study feed for the CISSP® exam. Short stories, flashcards with spaced repetition and scenario questions across the eight domains." />
+    <!-- A canonical URL is never fetched, so subresource integrity does not apply. -->
+    <!-- nosemgrep: html.security.audit.missing-integrity.missing-integrity -->
+    <link rel="canonical" href="https://8domains.valerio.fyi/" />
+    <meta name="theme-color" content="#0c0a10" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f5f6fa" media="(prefers-color-scheme: light)" />
+    <meta name="referrer" content="no-referrer" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="8Domains" />
+    <meta property="og:url" content="https://8domains.valerio.fyi/" />
+    <meta property="og:title" content="8Domains: study the CISSP® one idea at a time" />
+    <meta property="og:description" content="A free, open source study feed for the CISSP® exam: short stories, spaced-repetition flashcards and scenario questions." />
+    <meta property="og:image" content="https://8domains.valerio.fyi/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="8Domains: study the CISSP one idea at a time." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/spectral-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/landing.css" />
   </head>
   <body>
-    <main>
-      <header class="hero">
-        <img src="/icon.svg" alt="" width="56" height="56" />
-        <h1>8Domains</h1>
-        <p class="lead">Study for the CISSP® exam in short, scrollable stories. One idea per screen, all eight domains, works offline.</p>
-        <div class="cta">
-          <a class="btn primary" href="https://accounts.8domains.valerio.fyi/sign-up?redirect_url=https%3A%2F%2F8domains.valerio.fyi%2Fapp%2F">Create account</a>
-          <a class="btn" href="/app/">Sign in</a>
-        </div>
-        <p class="note">Free, in open preview.</p>
-      </header>
+    <header class="top wrap">
+      <a class="logo" href="/" aria-label="8Domains home"><em>8</em>Domains</a>
+      <a class="top-link" href="/app/">Sign in</a>
+    </header>
 
-      <section aria-labelledby="what">
-        <h2 id="what">What's inside</h2>
-        <ul class="cards">
-          <li>
-            <h3>Knowledge base</h3>
-            <p>Concepts mapped to every objective of the 2024 exam outline, with exam traps and the manager's view.</p>
+    <main>
+      <section class="hero wrap" aria-labelledby="title">
+        <div class="hero-text">
+          <h1 id="title">Study the CISSP® <em>one idea</em> at a time.</h1>
+          <p class="lead">Short, scrollable stories for all eight domains. One concept per screen, flashcards that come back when you are about to forget them, and it works offline.</p>
+          <div class="cta">
+            <a class="btn btn-primary" href="https://accounts.8domains.valerio.fyi/sign-up?redirect_url=https%3A%2F%2F8domains.valerio.fyi%2Fapp%2F">Create account</a>
+            <a class="btn btn-secondary" href="/app/">Sign in</a>
+          </div>
+          <p class="note">Free, in open preview. Google or email, no password.</p>
+        </div>
+
+        <!-- A static copy of a story screen from the app. -->
+        <div class="preview" aria-hidden="true">
+          <div class="story d1">
+            <div class="segs"><span class="on"></span><span></span><span></span><span></span><span></span><span></span></div>
+            <p class="story-ref">D1 · 1.3</p>
+            <div class="story-body">
+              <p class="story-kicker">Due care vs due diligence</p>
+              <p class="story-hook">Due diligence is the <em>homework</em>; due care is <mark class="hl hl-y">the doing</mark>.</p>
+            </div>
+            <div class="story-foot">
+              <span class="arrow">←</span>
+              <span class="count">1 / 6</span>
+              <span class="arrow arrow-next">→</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="wrap band" aria-labelledby="domains">
+        <h2 id="domains">Eight domains</h2>
+        <p class="sub">Every objective of the 2024 exam outline, with its share of the exam.</p>
+        <ul class="domains">
+          <li class="tile d1">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M7 20h10M5 7h14M5 7l-3 6a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0z" /></svg>
+            <span class="num">1</span>
+            <span class="name">Security and Risk Management</span>
+            <span class="weight">16% of the exam</span>
           </li>
-          <li>
-            <h3>Flashcards</h3>
-            <p>Spaced repetition (FSRS) schedules each card for the day you are about to forget it.</p>
+          <li class="tile d2">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6a7 3 0 1 0 14 0a7 3 0 1 0-14 0M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3" /></svg>
+            <span class="num">2</span>
+            <span class="name">Asset Security</span>
+            <span class="weight">10% of the exam</span>
           </li>
-          <li>
-            <h3>Scenario questions</h3>
-            <p>Exam-style questions with an explanation for every option, not just the right one.</p>
+          <li class="tile d3">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 16l9 5 9-5" /></svg>
+            <span class="num">3</span>
+            <span class="name">Security Architecture and Engineering</span>
+            <span class="weight">13% of the exam</span>
           </li>
-          <li>
-            <h3>Study path</h3>
-            <p>Set your exam date and get a day-by-day path through the domains, weighted like the exam.</p>
+          <li class="tile d4">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0M17 5a2 2 0 1 0 4 0a2 2 0 1 0-4 0M17 19a2 2 0 1 0 4 0a2 2 0 1 0-4 0M7 11l10-5M7 13l10 5" /></svg>
+            <span class="num">4</span>
+            <span class="name">Communication and Network Security</span>
+            <span class="weight">13% of the exam</span>
+          </li>
+          <li class="tile d5">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15a4 4 0 1 0 8 0a4 4 0 1 0-8 0M11 12l9-9M16 7l3 3M14 9l2 2" /></svg>
+            <span class="num">5</span>
+            <span class="name">Identity and Access Management</span>
+            <span class="weight">13% of the exam</span>
+          </li>
+          <li class="tile d6">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11a6 6 0 1 0 12 0a6 6 0 1 0-12 0M20 20l-4.5-4.5" /></svg>
+            <span class="num">6</span>
+            <span class="name">Security Assessment and Testing</span>
+            <span class="weight">12% of the exam</span>
+          </li>
+          <li class="tile d7">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2-6 4 12 2-6h6" /></svg>
+            <span class="num">7</span>
+            <span class="name">Security Operations</span>
+            <span class="weight">13% of the exam</span>
+          </li>
+          <li class="tile d8">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" /></svg>
+            <span class="num">8</span>
+            <span class="name">Software Development Security</span>
+            <span class="weight">10% of the exam</span>
           </li>
         </ul>
       </section>
 
-      <section aria-labelledby="how">
-        <h2 id="how">How access works</h2>
-        <ol class="steps">
-          <li>Create a free account with Google or your email.</li>
-          <li>Sign in with Google or an email code, on any device.</li>
-        </ol>
+      <section class="wrap band" aria-labelledby="highlights">
+        <h2 id="highlights">How to read the highlights</h2>
+        <p class="sub">Each color means one thing, everywhere in the app.</p>
+        <dl class="colors">
+          <div>
+            <dt><span class="dot dot-y" aria-hidden="true"></span>Key fact</dt>
+            <dd>A backup kept in the server room burns in the <mark class="hl hl-y">same fire</mark>.</dd>
+          </div>
+          <div>
+            <dt><span class="dot dot-g" aria-hidden="true"></span>Exam action: what the exam rewards</dt>
+            <dd>Failed tests or scans <mark class="hl hl-g">break the build</mark> and return the change to its author.</dd>
+          </div>
+          <div>
+            <dt><span class="dot dot-b" aria-hidden="true"></span>Number to remember</dt>
+            <dd>Disable inactive accounts after <mark class="hl hl-b">30 days</mark> idle, or a period set by policy.</dd>
+          </div>
+        </dl>
       </section>
 
-      <section aria-labelledby="open">
+      <section class="wrap band" aria-labelledby="inside">
+        <h2 id="inside">What's inside</h2>
+        <ul class="features">
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5a2 2 0 0 1 2-2h14v14H6a2 2 0 0 0-2 2a2 2 0 0 0 2 2h14M8 7h8M8 11h5" /></svg>
+            <div>
+              <h3>Knowledge base</h3>
+              <p>Concepts mapped to every objective of the 2024 exam outline, with exam traps and the manager's view.</p>
+            </div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h12v11H4zM8 5h12v11" /></svg>
+            <div>
+              <h3>Flashcards</h3>
+              <p>Spaced repetition (FSRS) schedules each card for the day you are about to forget it.</p>
+            </div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.4M12 17h.01" /></svg>
+            <div>
+              <h3>Scenario questions</h3>
+              <p>Exam-style questions with an explanation for every option, not just the right one.</p>
+            </div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19a2 2 0 1 0 4 0a2 2 0 1 0-4 0M17 5a2 2 0 1 0 4 0a2 2 0 1 0-4 0M7 19h8a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h8" /></svg>
+            <div>
+              <h3>Study path</h3>
+              <p>Set your exam date and get a day-by-day path through the domains, weighted like the exam.</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="wrap band" aria-labelledby="start">
+        <h2 id="start">Get started</h2>
+        <ol class="steps">
+          <li><span class="step-num" aria-hidden="true">1</span>Create a free account with Google or your email.</li>
+          <li><span class="step-num" aria-hidden="true">2</span>Sign in on any device and pick a domain.</li>
+        </ol>
+        <div class="cta">
+          <a class="btn btn-primary" href="https://accounts.8domains.valerio.fyi/sign-up?redirect_url=https%3A%2F%2F8domains.valerio.fyi%2Fapp%2F">Create account</a>
+        </div>
+      </section>
+
+      <section class="wrap band" aria-labelledby="open">
         <h2 id="open">Open source, no tracking</h2>
-        <p>The code (MIT) and the study content (CC BY-SA 4.0) are on <a href="https://github.com/fennih/8domains">GitHub</a>. Your account is handled by Clerk; your study progress stays on your device. No ads, no analytics.</p>
+        <p class="prose">The code (MIT) and the study content (CC BY-SA 4.0) are on <a href="https://github.com/fennih/8domains">GitHub</a>. Your account is handled by Clerk; your study progress stays on your device. No ads, no analytics.</p>
       </section>
     </main>
 
-    <footer>
+    <footer class="wrap">
       <p>CISSP® is a registered certification mark of ISC2, Inc. This project is not affiliated with, endorsed by or sponsored by ISC2.</p>
     </footer>
   </body>
