@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { TOKEN } from '../lib/markup'
+import { CountUp } from './CountUp'
 
 const QUALIFIER = /\b(NOT|BEST|FIRST|MOST|LEAST|PRIMARY|PRIMARILY|MAIN|EXCEPT|LAST|GREATEST)\b/g
 const HIGHLIGHT = { y: 'hl-y', g: 'hl-g', b: 'hl-b' } as const
@@ -34,9 +35,11 @@ export function Inline({ text, qualifiers = false }: { text: string; qualifiers?
     if (part.length > 4 && part.startsWith('==') && part.endsWith('==')) {
       const body = part.slice(2, -2)
       const color = body[1] === ':' && (body[0] === 'g' || body[0] === 'b') ? body[0] : 'y'
+      const inner = color === 'y' ? body : body.slice(2)
+      // Focusable so the meaning tooltip (HighlightTip) is reachable by keyboard; described by a static text.
       return (
-        <mark key={i} className={`hl ${HIGHLIGHT[color]}`} style={order(marks++)}>
-          {color === 'y' ? body : body.slice(2)}
+        <mark key={i} className={`hl ${HIGHLIGHT[color]}`} style={order(marks++)} data-hl={color} tabIndex={0} aria-describedby={`hl-desc-${color}`}>
+          {color === 'b' ? <CountUp text={inner} /> : inner}
         </mark>
       )
     }

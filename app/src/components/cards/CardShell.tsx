@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { LiveContext } from '../live'
 
 // `live` marks the card on screen: highlighter animations only play inside a live card.
 // `prev`/`next` are the round side arrows and `below` the keyboard hint, shown from 1200px.
@@ -27,7 +28,7 @@ export function CardShell({
           aria-label={label}
           className={`d-${domain} card ${live ? 'live' : ''} story-card flex h-full w-full flex-col overflow-y-auto desk:max-w-[880px]`}
         >
-          {children}
+          <LiveContext.Provider value={live}>{children}</LiveContext.Provider>
         </article>
         {next && <div className="hidden desk:block">{next}</div>}
       </div>

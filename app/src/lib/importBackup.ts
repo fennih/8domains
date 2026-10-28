@@ -69,6 +69,8 @@ const settingsV2 = z.strictObject({
   theme: z.enum(['system', 'dark', 'light']),
   animations: z.boolean(),
   scope: scope.nullable(),
+  // Added after version 2 shipped: optional so older backups still import.
+  legendsSeen: z.array(z.enum(['y', 'g', 'b'])).max(3).optional(),
 })
 
 const rows = {
@@ -103,8 +105,8 @@ export async function parseBackup(file: File): Promise<BackupData> {
   // Version 1 had a daily cap on new concepts and no read tracking.
   const settings =
     d.version === 1
-      ? { firstLaunch: d.settings.firstLaunch, examDate: d.settings.examDate, theme: d.settings.theme, animations: true, scope: null }
-      : d.settings
+      ? { firstLaunch: d.settings.firstLaunch, examDate: d.settings.examDate, theme: d.settings.theme, animations: true, scope: null, legendsSeen: [] }
+      : { ...d.settings, legendsSeen: [...new Set(d.settings.legendsSeen ?? [])] }
   return {
     settings,
     cards: d.cards as CardRow[],

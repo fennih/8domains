@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ConceptSheetProvider } from './components/ConceptSheet'
+import { HighlightTip } from './components/HighlightTip'
 import { Nav, ROUTES, type Tab } from './components/Nav'
 import { loadKb } from './kb/load'
 import type { Kb } from './kb/types'
@@ -70,6 +71,7 @@ function Shell({ kb }: { kb: Kb }) {
           {tab === 'me' && <Me kb={kb} />}
         </main>
         {!studying && <Nav tab={tab} onChange={changeTab} due={due} />}
+        <HighlightTip />
       </div>
     </ConceptSheetProvider>
   )

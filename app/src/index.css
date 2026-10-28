@@ -355,24 +355,40 @@ strong {
 }
 
 .hl-y {
-  --hl-l: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23ecff74%27 d=%27M9.5 9L20.5 9L20.5 36.5L0 36.5Z%27/%3E%3Cpath fill=%27%23ecff74%27 fill-opacity=%27.5%27 d=%27M8.2 12L20.5 12L20.5 17L5.9 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M5.3 20L20.5 20L20.5 24.5L3.8 24.5Z%27/%3E%3C/svg%3E");
-  --hl-m: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23ecff74%27 d=%27M0 9C50 7 100 10 140 8S185 8.5 200 8L200 35C160 36.5 110 34.5 70 36S20 36 0 36.5Z%27/%3E%3Cpath fill=%27%23ecff74%27 fill-opacity=%27.5%27 d=%27M0 12C70 10.5 130 13 200 11L200 16C130 17.5 70 15 0 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M0 20C70 18.5 140 21 200 19L200 23.5C140 25 70 22.5 0 24.5Z%27/%3E%3C/svg%3E");
-  --hl-r: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23ecff74%27 d=%27M-0.5 8L20 8L11 35L-0.5 35Z%27/%3E%3Cpath fill=%27%23ecff74%27 fill-opacity=%27.5%27 d=%27M-0.5 11L19 11L17.3 16L-0.5 16Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M-0.5 19L16.3 19L14.8 23.5L-0.5 23.5Z%27/%3E%3C/svg%3E");
+  --hl-l: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23fff1a0%27 d=%27M9.5 9L20.5 9L20.5 36.5L0 36.5Z%27/%3E%3Cpath fill=%27%23fff1a0%27 fill-opacity=%27.5%27 d=%27M8.2 12L20.5 12L20.5 17L5.9 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M5.3 20L20.5 20L20.5 24.5L3.8 24.5Z%27/%3E%3C/svg%3E");
+  --hl-m: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23fff1a0%27 d=%27M0 9C50 7 100 10 140 8S185 8.5 200 8L200 35C160 36.5 110 34.5 70 36S20 36 0 36.5Z%27/%3E%3Cpath fill=%27%23fff1a0%27 fill-opacity=%27.5%27 d=%27M0 12C70 10.5 130 13 200 11L200 16C130 17.5 70 15 0 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M0 20C70 18.5 140 21 200 19L200 23.5C140 25 70 22.5 0 24.5Z%27/%3E%3C/svg%3E");
+  --hl-r: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23fff1a0%27 d=%27M-0.5 8L20 8L11 35L-0.5 35Z%27/%3E%3Cpath fill=%27%23fff1a0%27 fill-opacity=%27.5%27 d=%27M-0.5 11L19 11L17.3 16L-0.5 16Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M-0.5 19L16.3 19L14.8 23.5L-0.5 23.5Z%27/%3E%3C/svg%3E");
 }
 .hl-g {
-  --hl-l: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%239ef5d2%27 d=%27M9.5 9L20.5 9L20.5 36.5L0 36.5Z%27/%3E%3Cpath fill=%27%239ef5d2%27 fill-opacity=%27.5%27 d=%27M8.2 12L20.5 12L20.5 17L5.9 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M5.3 20L20.5 20L20.5 24.5L3.8 24.5Z%27/%3E%3C/svg%3E");
-  --hl-m: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%239ef5d2%27 d=%27M0 9C50 7 100 10 140 8S185 8.5 200 8L200 35C160 36.5 110 34.5 70 36S20 36 0 36.5Z%27/%3E%3Cpath fill=%27%239ef5d2%27 fill-opacity=%27.5%27 d=%27M0 12C70 10.5 130 13 200 11L200 16C130 17.5 70 15 0 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M0 20C70 18.5 140 21 200 19L200 23.5C140 25 70 22.5 0 24.5Z%27/%3E%3C/svg%3E");
-  --hl-r: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%239ef5d2%27 d=%27M-0.5 8L20 8L11 35L-0.5 35Z%27/%3E%3Cpath fill=%27%239ef5d2%27 fill-opacity=%27.5%27 d=%27M-0.5 11L19 11L17.3 16L-0.5 16Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M-0.5 19L16.3 19L14.8 23.5L-0.5 23.5Z%27/%3E%3C/svg%3E");
+  --hl-l: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23a8f0c8%27 d=%27M9.5 9L20.5 9L20.5 36.5L0 36.5Z%27/%3E%3Cpath fill=%27%23a8f0c8%27 fill-opacity=%27.5%27 d=%27M8.2 12L20.5 12L20.5 17L5.9 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M5.3 20L20.5 20L20.5 24.5L3.8 24.5Z%27/%3E%3C/svg%3E");
+  --hl-m: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23a8f0c8%27 d=%27M0 9C50 7 100 10 140 8S185 8.5 200 8L200 35C160 36.5 110 34.5 70 36S20 36 0 36.5Z%27/%3E%3Cpath fill=%27%23a8f0c8%27 fill-opacity=%27.5%27 d=%27M0 12C70 10.5 130 13 200 11L200 16C130 17.5 70 15 0 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M0 20C70 18.5 140 21 200 19L200 23.5C140 25 70 22.5 0 24.5Z%27/%3E%3C/svg%3E");
+  --hl-r: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23a8f0c8%27 d=%27M-0.5 8L20 8L11 35L-0.5 35Z%27/%3E%3Cpath fill=%27%23a8f0c8%27 fill-opacity=%27.5%27 d=%27M-0.5 11L19 11L17.3 16L-0.5 16Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M-0.5 19L16.3 19L14.8 23.5L-0.5 23.5Z%27/%3E%3C/svg%3E");
 }
 .hl-b {
-  --hl-l: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23cdb8ff%27 d=%27M9.5 9L20.5 9L20.5 36.5L0 36.5Z%27/%3E%3Cpath fill=%27%23cdb8ff%27 fill-opacity=%27.5%27 d=%27M8.2 12L20.5 12L20.5 17L5.9 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M5.3 20L20.5 20L20.5 24.5L3.8 24.5Z%27/%3E%3C/svg%3E");
-  --hl-m: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23cdb8ff%27 d=%27M0 9C50 7 100 10 140 8S185 8.5 200 8L200 35C160 36.5 110 34.5 70 36S20 36 0 36.5Z%27/%3E%3Cpath fill=%27%23cdb8ff%27 fill-opacity=%27.5%27 d=%27M0 12C70 10.5 130 13 200 11L200 16C130 17.5 70 15 0 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M0 20C70 18.5 140 21 200 19L200 23.5C140 25 70 22.5 0 24.5Z%27/%3E%3C/svg%3E");
-  --hl-r: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23cdb8ff%27 d=%27M-0.5 8L20 8L11 35L-0.5 35Z%27/%3E%3Cpath fill=%27%23cdb8ff%27 fill-opacity=%27.5%27 d=%27M-0.5 11L19 11L17.3 16L-0.5 16Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M-0.5 19L16.3 19L14.8 23.5L-0.5 23.5Z%27/%3E%3C/svg%3E");
+  --hl-l: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23a8d8ff%27 d=%27M9.5 9L20.5 9L20.5 36.5L0 36.5Z%27/%3E%3Cpath fill=%27%23a8d8ff%27 fill-opacity=%27.5%27 d=%27M8.2 12L20.5 12L20.5 17L5.9 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M5.3 20L20.5 20L20.5 24.5L3.8 24.5Z%27/%3E%3C/svg%3E");
+  --hl-m: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23a8d8ff%27 d=%27M0 9C50 7 100 10 140 8S185 8.5 200 8L200 35C160 36.5 110 34.5 70 36S20 36 0 36.5Z%27/%3E%3Cpath fill=%27%23a8d8ff%27 fill-opacity=%27.5%27 d=%27M0 12C70 10.5 130 13 200 11L200 16C130 17.5 70 15 0 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M0 20C70 18.5 140 21 200 19L200 23.5C140 25 70 22.5 0 24.5Z%27/%3E%3C/svg%3E");
+  --hl-r: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23a8d8ff%27 d=%27M-0.5 8L20 8L11 35L-0.5 35Z%27/%3E%3Cpath fill=%27%23a8d8ff%27 fill-opacity=%27.5%27 d=%27M-0.5 11L19 11L17.3 16L-0.5 16Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M-0.5 19L16.3 19L14.8 23.5L-0.5 23.5Z%27/%3E%3C/svg%3E");
+}
+/* Light theme: the same strokes, slightly deeper so they stand out on white. */
+[data-theme='light'] .hl-y {
+  --hl-l: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23ffe27a%27 d=%27M9.5 9L20.5 9L20.5 36.5L0 36.5Z%27/%3E%3Cpath fill=%27%23ffe27a%27 fill-opacity=%27.5%27 d=%27M8.2 12L20.5 12L20.5 17L5.9 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M5.3 20L20.5 20L20.5 24.5L3.8 24.5Z%27/%3E%3C/svg%3E");
+  --hl-m: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23ffe27a%27 d=%27M0 9C50 7 100 10 140 8S185 8.5 200 8L200 35C160 36.5 110 34.5 70 36S20 36 0 36.5Z%27/%3E%3Cpath fill=%27%23ffe27a%27 fill-opacity=%27.5%27 d=%27M0 12C70 10.5 130 13 200 11L200 16C130 17.5 70 15 0 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M0 20C70 18.5 140 21 200 19L200 23.5C140 25 70 22.5 0 24.5Z%27/%3E%3C/svg%3E");
+  --hl-r: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%23ffe27a%27 d=%27M-0.5 8L20 8L11 35L-0.5 35Z%27/%3E%3Cpath fill=%27%23ffe27a%27 fill-opacity=%27.5%27 d=%27M-0.5 11L19 11L17.3 16L-0.5 16Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M-0.5 19L16.3 19L14.8 23.5L-0.5 23.5Z%27/%3E%3C/svg%3E");
+}
+[data-theme='light'] .hl-g {
+  --hl-l: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%238fe6b5%27 d=%27M9.5 9L20.5 9L20.5 36.5L0 36.5Z%27/%3E%3Cpath fill=%27%238fe6b5%27 fill-opacity=%27.5%27 d=%27M8.2 12L20.5 12L20.5 17L5.9 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M5.3 20L20.5 20L20.5 24.5L3.8 24.5Z%27/%3E%3C/svg%3E");
+  --hl-m: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%238fe6b5%27 d=%27M0 9C50 7 100 10 140 8S185 8.5 200 8L200 35C160 36.5 110 34.5 70 36S20 36 0 36.5Z%27/%3E%3Cpath fill=%27%238fe6b5%27 fill-opacity=%27.5%27 d=%27M0 12C70 10.5 130 13 200 11L200 16C130 17.5 70 15 0 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M0 20C70 18.5 140 21 200 19L200 23.5C140 25 70 22.5 0 24.5Z%27/%3E%3C/svg%3E");
+  --hl-r: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%238fe6b5%27 d=%27M-0.5 8L20 8L11 35L-0.5 35Z%27/%3E%3Cpath fill=%27%238fe6b5%27 fill-opacity=%27.5%27 d=%27M-0.5 11L19 11L17.3 16L-0.5 16Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M-0.5 19L16.3 19L14.8 23.5L-0.5 23.5Z%27/%3E%3C/svg%3E");
+}
+[data-theme='light'] .hl-b {
+  --hl-l: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%2390c8ff%27 d=%27M9.5 9L20.5 9L20.5 36.5L0 36.5Z%27/%3E%3Cpath fill=%27%2390c8ff%27 fill-opacity=%27.5%27 d=%27M8.2 12L20.5 12L20.5 17L5.9 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M5.3 20L20.5 20L20.5 24.5L3.8 24.5Z%27/%3E%3C/svg%3E");
+  --hl-m: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%2390c8ff%27 d=%27M0 9C50 7 100 10 140 8S185 8.5 200 8L200 35C160 36.5 110 34.5 70 36S20 36 0 36.5Z%27/%3E%3Cpath fill=%27%2390c8ff%27 fill-opacity=%27.5%27 d=%27M0 12C70 10.5 130 13 200 11L200 16C130 17.5 70 15 0 17Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M0 20C70 18.5 140 21 200 19L200 23.5C140 25 70 22.5 0 24.5Z%27/%3E%3C/svg%3E");
+  --hl-r: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 20 40%27 preserveAspectRatio=%27none%27%3E%3Cpath fill=%27%2390c8ff%27 d=%27M-0.5 8L20 8L11 35L-0.5 35Z%27/%3E%3Cpath fill=%27%2390c8ff%27 fill-opacity=%27.5%27 d=%27M-0.5 11L19 11L17.3 16L-0.5 16Z%27/%3E%3Cpath fill=%27%23fff%27 fill-opacity=%27.2%27 d=%27M-0.5 19L16.3 19L14.8 23.5L-0.5 23.5Z%27/%3E%3C/svg%3E");
 }
 
 .ul-mark {
   text-decoration: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 12%27 preserveAspectRatio=%27none%27%3E%3Cpath d=%27M2 7.5C40 4.5 80 9 120 6S175 4.5 198 6.5%27 fill=%27none%27 stroke=%27%23ff7ad9%27 stroke-width=%274.5%27 stroke-linecap=%27round%27/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 12%27 preserveAspectRatio=%27none%27%3E%3Cpath d=%27M2 7.5C40 4.5 80 9 120 6S175 4.5 198 6.5%27 fill=%27none%27 stroke=%27%23b28cff%27 stroke-width=%274.5%27 stroke-linecap=%27round%27/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-size: 100% 0.32em;
   background-position: 0 100%;
@@ -381,9 +397,67 @@ strong {
   box-decoration-break: clone;
 }
 
+[data-theme='light'] .ul-mark {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 12%27 preserveAspectRatio=%27none%27%3E%3Cpath d=%27M2 7.5C40 4.5 80 9 120 6S175 4.5 198 6.5%27 fill=%27none%27 stroke=%27%236f3fe0%27 stroke-width=%274.5%27 stroke-linecap=%27round%27/%3E%3C/svg%3E");
+}
+
+/* Marks are focusable for the meaning tooltip; long-press must not open the system callout. */
+.hl {
+  -webkit-touch-callout: none;
+  border-radius: 2px;
+}
+.hl:focus-visible {
+  outline-offset: 3px;
+}
+
+/* First-time legend and the meaning tooltip: a colored square plus the meaning, in the marker color on dark. */
+.hl-legend,
+.hl-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--legend) 45%, transparent);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--legend-ink);
+}
+.hl-legend-y { --legend: var(--hl-y); }
+.hl-legend-g { --legend: var(--hl-g); }
+.hl-legend-b { --legend: var(--hl-b); }
+.hl-legend-y,
+.hl-legend-g,
+.hl-legend-b {
+  --legend-ink: var(--legend);
+}
+[data-theme='light'] .hl-legend-y,
+[data-theme='light'] .hl-legend-g,
+[data-theme='light'] .hl-legend-b {
+  --legend-ink: var(--c-text-2);
+}
+.hl-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--legend);
+}
+.hl-tip {
+  position: fixed;
+  z-index: 50;
+  transform: translate(-50%, calc(-100% - 8px));
+  background: var(--c-surface);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  html[data-anim='on'] .live .hl {
+  html[data-anim='on'] .live .hl-y {
     animation: hl-sweep 450ms cubic-bezier(0.25, 0.7, 0.3, 1) both;
+    animation-delay: calc(170ms + var(--reveal-delay, 0ms) + var(--hl-i, 0) * 150ms);
+  }
+  html[data-anim='on'] .live .hl-g {
+    animation: hl-underline-fill 620ms cubic-bezier(0.25, 0.7, 0.3, 1) both;
     animation-delay: calc(170ms + var(--reveal-delay, 0ms) + var(--hl-i, 0) * 150ms);
   }
   html[data-anim='on'] .live .ul-mark {
@@ -416,6 +490,25 @@ strong {
   100% {
     background-size: var(--cap) 100%, calc(100% - 2 * var(--cap) + 3px) 100%, var(--cap) 100%;
     background-position: 0 0, calc(var(--cap) - 1.5px) 0, 100% 0;
+    color: var(--hl-fg);
+  }
+}
+
+/* Mint: a thin underline runs along the bottom, then rises to fill the stroke. */
+@keyframes hl-underline-fill {
+  0% {
+    background-size: var(--cap) 16%, 0px 16%, var(--cap) 16%;
+    background-position: 0 100%, calc(var(--cap) - 1.5px) 100%, calc(var(--cap) - 3px) 100%;
+    color: var(--c-text);
+  }
+  50% {
+    background-size: var(--cap) 16%, calc(100% - 2 * var(--cap) + 3px) 16%, var(--cap) 16%;
+    background-position: 0 100%, calc(var(--cap) - 1.5px) 100%, 100% 100%;
+    color: var(--c-text);
+  }
+  100% {
+    background-size: var(--cap) 100%, calc(100% - 2 * var(--cap) + 3px) 100%, var(--cap) 100%;
+    background-position: 0 100%, calc(var(--cap) - 1.5px) 100%, 100% 100%;
     color: var(--hl-fg);
   }
 }

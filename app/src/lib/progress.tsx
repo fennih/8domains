@@ -27,7 +27,7 @@ const ProgressContext = createContext<ProgressApi | null>(null)
 
 export function defaultSettings(): Settings {
   const today = new Date()
-  return { firstLaunch: toIsoDate(today), examDate: toIsoDate(addDays(today, 84)), theme: 'dark', animations: true, scope: null }
+  return { firstLaunch: toIsoDate(today), examDate: toIsoDate(addDays(today, 84)), theme: 'dark', animations: true, scope: null, legendsSeen: [] }
 }
 
 // Settings saved by older versions may lack newer fields or carry removed ones (newPerDay).
@@ -40,6 +40,7 @@ function normalizeSettings(raw: Partial<Settings> | undefined): Settings {
     theme: raw.theme ?? d.theme,
     animations: raw.animations ?? d.animations,
     scope: raw.scope ?? null,
+    legendsSeen: raw.legendsSeen ?? [],
   }
 }
 

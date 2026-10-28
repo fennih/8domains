@@ -1,5 +1,6 @@
 import { Dexie, type EntityTable } from 'dexie'
 import type { Card, Grade } from 'ts-fsrs'
+import type { HighlightColor } from './markup'
 import type { Scope } from './scope'
 
 export interface CardRow extends Card {
@@ -29,12 +30,15 @@ export interface SeenRow {
 
 export type Theme = 'system' | 'dark' | 'light'
 
+
 export interface Settings {
   firstLaunch: string
   examDate: string
   theme: Theme
   animations: boolean
   scope: Scope | null
+  // Colors whose first-time legend was already shown.
+  legendsSeen: HighlightColor[]
 }
 
 export interface SettingRow {

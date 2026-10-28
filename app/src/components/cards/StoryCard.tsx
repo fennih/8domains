@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent } from 'react'
-import type { Concept } from '../../kb/types'
+import { itemSubs, itemText, type Concept } from '../../kb/types'
 import { conceptStory, type Screen } from '../../lib/beats'
 import { useActiveKeys } from '../../lib/keys'
+import { highlightColors, type HighlightColor } from '../../lib/markup'
 import { useProgress } from '../../lib/progress'
 import { Bullets } from '../Bullets'
+import { HighlightLegend } from '../HighlightLegend'
 import { Inline } from '../Inline'
 import { useOpenConcept } from '../openConcept'
 import { CardShell } from './CardShell'
@@ -67,10 +69,20 @@ function ScreenBody({ screen, reveal, title }: { screen: Screen; reveal: number;
   }
 }
 
+// Text visible on a screen at a given reveal step, used to find which highlight colors are showing.
+function screenText(screen: Screen, reveal: number): string {
+  if ('items' in screen)
+    return screen.items
+      .slice(0, reveal)
+      .flatMap((li) => [itemText(li), ...itemSubs(li)])
+      .join(' ')
+  return screen.text
+}
+
 const arrowBase = 'inline-flex items-center justify-center font-bold disabled:opacity-40'
 
 export function StoryCard({ concept, active, onDone }: { concept: Concept; active: boolean; onDone: () => void }) {
-  const { markSeen, markRead } = useProgress()
+  const { state, markSeen, markRead, updateSettings } = useProgress()
   const openConcept = useOpenConcept()
   const { screens, steps } = useMemo(() => conceptStory(concept), [concept])
   const [index, setIndex] = useState(0)
@@ -87,6 +99,19 @@ export function StoryCard({ concept, active, onDone }: { concept: Concept; activ
   useEffect(() => {
     if (index === last) markRead(concept.id)
   }, [index, last, concept.id, markRead])
+
+  // First time a highlight color shows anywhere, its legend appears under this screen, then never again.
+  const legendAt = useRef(new Map<HighlightColor, number>())
+  const seenLegends = state.settings.legendsSeen
+  const visibleColors = useMemo(() => highlightColors(screenText(screens[step.screen]!, step.reveal)), [screens, step.screen, step.reveal])
+  useEffect(() => {
+    if (!active) return
+    const fresh = visibleColors.filter((c) => !seenLegends.includes(c) && !legendAt.current.has(c))
+    if (fresh.length === 0) return
+    for (const c of fresh) legendAt.current.set(c, step.screen)
+    void updateSettings({ legendsSeen: [...seenLegends, ...fresh] })
+  }, [active, visibleColors, seenLegends, step.screen, updateSettings])
+  const legend = [...legendAt.current].filter(([, s]) => s === step.screen).map(([c]) => c)
 
   // Moving within a list screen reveals or hides one bullet; the screen itself stays mounted.
   const go = (to: number) => {
@@ -196,6 +221,7 @@ export function StoryCard({ concept, active, onDone }: { concept: Concept; activ
         <div className="w-full" aria-live={active ? 'polite' : 'off'}>
           <div key={step.screen} className={`beat-${dir} story-body flex flex-col`}>
             <ScreenBody screen={screens[step.screen]!} reveal={step.reveal} title={concept.title} />
+            <HighlightLegend colors={legend} />
           </div>
         </div>
       </div>
