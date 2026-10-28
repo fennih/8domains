@@ -1,4 +1,5 @@
 import { useClerk, useUser } from '@clerk/react'
+import { btnSecondary } from './buttons'
 import { Label } from './Chips'
 
 export function Account() {
@@ -9,10 +10,10 @@ export function Account() {
       <Label>Account</Label>
       {user && <p className="text-sm text-muted">Signed in as {user.primaryEmailAddress?.emailAddress ?? user.id}</p>}
       <div className="flex flex-wrap gap-2">
-        <a href={clerk.buildUserProfileUrl()} className="rounded-full border border-line px-4 py-2 text-sm font-semibold">
+        <a href={clerk.buildUserProfileUrl()} className={btnSecondary}>
           Manage account
         </a>
-        <button type="button" onClick={() => void clerk.signOut({ redirectUrl: '/' })} className="rounded-full border border-line px-4 py-2 text-sm font-semibold">
+        <button type="button" onClick={() => void clerk.signOut({ redirectUrl: '/' })} className={btnSecondary}>
           Sign out
         </button>
       </div>

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { Kb } from '../kb/types'
-import { Bar, Ring } from '../components/Chips'
+import { btnPrimary, btnSecondary } from '../components/buttons'
+import { Bar } from '../components/Chips'
+import { DomainIcon, DomainRing, DomainTile } from '../components/DomainTile'
 import { computeCoverage, nextObjective, pct } from '../lib/coverage'
 import type { Plan } from '../lib/plan'
 import { useProgress } from '../lib/progress'
@@ -11,13 +13,11 @@ export function StreakBadge() {
   const { state } = useProgress()
   const n = streak(state, new Date())
   return (
-    <span className="shrink-0 whitespace-nowrap rounded-full border border-line bg-surface px-3 py-1 text-xs font-bold text-muted" title="Days in a row with some study">
+    <span className="shrink-0 self-start whitespace-nowrap rounded-full border border-line px-2.5 py-1 text-xs font-bold text-muted" title="Days in a row with some study">
       {n > 0 ? `${n}-day streak` : 'No streak yet'}
     </span>
   )
 }
-
-const pillButton = 'rounded-full px-5 py-2.5 text-sm font-bold'
 
 export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Scope) => void }) {
   const { state } = useProgress()
@@ -32,23 +32,24 @@ export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Sco
     const dc = cov.domains.get(d.number)!
     return (
       <div className={`d-${d.number} mx-auto flex h-full max-w-5xl flex-col gap-4 overflow-y-auto px-4 py-6 md:px-8`}>
-        <button type="button" onClick={() => setDomainView(null)} className="self-start rounded-full border border-line bg-surface px-3 py-1 text-sm font-semibold">
+        <button type="button" onClick={() => setDomainView(null)} className="min-h-11 self-start text-sm font-semibold text-muted hover:text-fg">
           &larr; All domains
         </button>
         <header className="tile flex items-center gap-4 p-5">
-          <Ring value={pct(dc.concepts)} size={64} />
+          <DomainRing domain={d.number} value={pct(dc.concepts)} />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold uppercase tracking-wider text-dc-ink">Domain {d.number} · {d.weight}% of exam</p>
-            <h1 className="text-2xl font-bold leading-tight md:text-3xl">{d.title}</h1>
+            <h1 className="text-3xl leading-tight md:text-4xl">{d.title}</h1>
             <p className="text-sm text-muted">{dc.concepts.total === 0 ? 'Content coming' : `${dc.concepts.done}/${dc.concepts.total} concepts read`}</p>
           </div>
+          <DomainIcon domain={d.number} className="h-6 w-6 self-start" />
         </header>
         {dc.concepts.total > 0 && (
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => onPick({ kind: 'domain', domain: d.number })} className={`${pillButton} bg-accent text-accent-fg`}>
+            <button type="button" onClick={() => onPick({ kind: 'domain', domain: d.number })} className={btnPrimary}>
               Study whole domain
             </button>
-            <button type="button" onClick={() => onPick({ kind: 'domain-mix', domain: d.number })} className={`${pillButton} border border-line bg-surface`}>
+            <button type="button" onClick={() => onPick({ kind: 'domain-mix', domain: d.number })} className={btnSecondary}>
               Mix this domain
             </button>
           </div>
@@ -58,7 +59,7 @@ export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Sco
             const oc = cov.objectives.get(o.id)!
             return (
               <li key={o.id} className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3 md:p-4">
-                <span className="w-10 shrink-0 font-display text-sm font-bold text-dc-ink">{o.id}</span>
+                <span className="w-10 shrink-0 font-display text-base italic text-dc-ink">{o.id}</span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold leading-snug md:text-base">{o.title}</p>
                   {oc.concepts.total > 0 ? (
@@ -76,7 +77,7 @@ export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Sco
                   <button
                     type="button"
                     onClick={() => onPick({ kind: 'objective', objective: o.id })}
-                    className="shrink-0 rounded-full bg-dc-soft px-3 py-1.5 text-sm font-bold text-dc-ink"
+                    className="min-h-11 shrink-0 rounded-[10px] border border-dc-edge px-3 text-sm font-bold text-dc-ink"
                     aria-label={`Study ${o.id} ${o.title}`}
                   >
                     Study this
@@ -92,59 +93,72 @@ export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Sco
 
   const lastProgress = last && last.kind !== 'due' ? scopeConcepts(kb, last) : []
   return (
-    <div className="mx-auto flex h-full max-w-5xl flex-col gap-5 overflow-y-auto px-4 py-6 md:px-8">
-      <header className="flex items-start justify-between gap-3">
-        <h1 className="text-3xl font-extrabold md:text-4xl">What do you want to study?</h1>
+    <div className="home mx-auto flex h-full w-full flex-col gap-3 overflow-y-auto px-4 pb-6 pt-[18px]">
+      <div className="flex items-center justify-between gap-3 desk:hidden">
         <StreakBadge />
-      </header>
+        <HomeLinks />
+      </div>
 
-      {suggested && (
-        <button
-          type="button"
-          onClick={() => onPick({ kind: 'objective', objective: suggested.id })}
-          className="-mt-2 self-start text-left text-sm text-muted hover:text-fg"
-        >
-          Suggested next: <span className="font-semibold text-fg">{suggested.id} {suggested.title}</span>
-        </button>
-      )}
+      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+        <div className="flex flex-col gap-1">
+          <h1 className="home-title leading-[1.05] tracking-[-0.015em]">
+            What do you want to <em className="italic text-accent">study</em>?
+          </h1>
+          {suggested && (
+            <button
+              type="button"
+              onClick={() => onPick({ kind: 'objective', objective: suggested.id })}
+              className="min-h-11 self-start text-left text-sm text-muted hover:text-fg md:text-base"
+            >
+              Suggested next: <span className="font-semibold text-fg">{suggested.id} {suggested.title}</span>
+            </button>
+          )}
+        </div>
+        <div className="hidden desk:flex">
+          <HomeLinks />
+        </div>
+      </header>
 
       <div className="flex flex-wrap gap-2">
         {last && (last.kind !== 'due' || due > 0) && (
-          <button type="button" onClick={() => onPick(last)} className={`${pillButton} bg-accent text-accent-fg`}>
+          <button type="button" onClick={() => onPick(last)} className={`${btnPrimary} flex-1 md:flex-none`}>
             Continue {scopeLabel(last)}
             {lastProgress.length > 0 && ` · ${lastProgress.filter((c) => state.read.has(c.id)).length}/${lastProgress.length}`}
           </button>
         )}
-        <button type="button" onClick={() => onPick({ kind: 'mix' })} className={`${pillButton} border border-line bg-surface`}>
-          Mix everything
+        <button type="button" onClick={() => onPick({ kind: 'mix' })} className={btnSecondary}>
+          Mix all
         </button>
         {due > 0 && (
-          <button type="button" onClick={() => onPick({ kind: 'due' })} className={`${pillButton} border border-line bg-surface`}>
-            Review {due} due flashcard{due === 1 ? '' : 's'}
+          <button type="button" onClick={() => onPick({ kind: 'due' })} className={btnSecondary}>
+            Review {due} due
           </button>
         )}
       </div>
 
-      <ul className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Domains">
-        {kb.outline.domains.map((d) => {
-          const dc = cov.domains.get(d.number)!
-          const empty = dc.concepts.total === 0
-          return (
-            <li key={d.id} className={`d-${d.number}`}>
-              <button type="button" onClick={() => setDomainView(d.number)} className="tile flex h-full w-full flex-col gap-2 p-4 text-left">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="font-display text-3xl font-extrabold text-dc-ink">{d.number}</span>
-                  <Ring value={pct(dc.concepts)} size={44} label={empty ? 'Content coming' : `${pct(dc.concepts)}% read`} />
-                </div>
-                <span className="text-sm font-bold leading-snug">{d.title}</span>
-                <span className="mt-auto text-xs text-muted">{empty ? 'Content coming' : `${dc.concepts.done}/${dc.concepts.total} read · ${d.weight}% of exam`}</span>
-              </button>
-            </li>
-          )
-        })}
+      <ul className="domain-grid mt-1 grid list-none p-0" aria-label="Domains">
+        {kb.outline.domains.map((d) => (
+          <li key={d.id}>
+            <DomainTile domain={d.number} title={d.title} value={pct(cov.domains.get(d.number)!.concepts)} onOpen={() => setDomainView(d.number)} />
+          </li>
+        ))}
       </ul>
 
-      {last && <p className="text-xs text-muted">Last studied: {scopeTitle(kb, last)}</p>}
+      {last && <p className="text-[13px] text-muted">Last studied: {scopeTitle(kb, last)}</p>}
     </div>
+  )
+}
+
+// Coverage and Browse are routes reached from Home, not tabs.
+function HomeLinks() {
+  return (
+    <span className="flex gap-4 text-[13px] font-semibold md:gap-5 md:text-[15px]">
+      <a href="#coverage" className="inline-flex min-h-11 items-center text-muted hover:text-fg">
+        Coverage
+      </a>
+      <a href="#browse" className="inline-flex min-h-11 items-center text-muted hover:text-fg">
+        Browse
+      </a>
+    </span>
   )
 }
