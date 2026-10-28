@@ -2,7 +2,7 @@
 
 Free, open source study app for the CISSP® exam: a knowledge base mapped to the eight domains of the ISC2 2024 exam outline, flashcards with spaced repetition, scenario questions and a study path, served as a scrollable mobile-first feed. Works offline, no ads, no tracking.
 
-Live: https://8domains.valerio.fyi (open preview: request access on the landing page). Study progress stays on your device.
+Live: https://8domains.valerio.fyi (open preview: create a free account on the landing page). Study progress stays on your device.
 
 ## Run
 
