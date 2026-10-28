@@ -1,0 +1,19 @@
+# Local study material — never committed
+resources/
+sources/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Env / OS
+.env
+.env.*
+.DS_Store
+app/public/kb/
