@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ConceptSheetProvider } from './components/ConceptSheet'
-import { Nav, TABS, type Tab } from './components/Nav'
+import { Nav, ROUTES, type Tab } from './components/Nav'
 import { loadKb } from './kb/load'
 import type { Kb } from './kb/types'
 import { parseIsoDate } from './lib/dates'
@@ -18,7 +18,7 @@ import { Me } from './views/Me'
 // The app always opens on Home (never straight into content); other tabs survive a reload.
 function tabFromHash(): Tab {
   const h = window.location.hash.slice(1)
-  return TABS.some((t) => t.id === h) && h !== 'feed' ? (h as Tab) : 'home'
+  return ROUTES.includes(h as Tab) && h !== 'feed' ? (h as Tab) : 'home'
 }
 
 function Shell({ kb }: { kb: Kb }) {
@@ -54,10 +54,13 @@ function Shell({ kb }: { kb: Kb }) {
     changeTab('feed')
   }
 
+  // Studying is full screen: the nav steps aside until the feed is closed.
+  const studying = tab === 'feed' && scope !== null
+
   return (
     <ConceptSheetProvider kb={kb}>
-      <div className="flex h-full flex-col md:flex-row-reverse">
-        <main className="app-main mx-auto w-full md:min-w-0 md:flex-1" id="main">
+      <div className="flex h-full flex-col desk:flex-row-reverse">
+        <main className={`${studying ? 'app-main-full' : 'app-main'} mx-auto w-full desk:min-w-0 desk:flex-1`} id="main">
           <div hidden={tab !== 'feed'} className="h-full">
             <Feed key={scope ? scopeKey(scope) : 'none'} kb={kb} scope={scope} visible={tab === 'feed'} onPick={pick} onHome={() => changeTab('home')} />
           </div>
@@ -66,7 +69,7 @@ function Shell({ kb }: { kb: Kb }) {
           {tab === 'browse' && <Browse kb={kb} />}
           {tab === 'me' && <Me kb={kb} />}
         </main>
-        <Nav tab={tab} onChange={changeTab} due={due} />
+        {!studying && <Nav tab={tab} onChange={changeTab} due={due} />}
       </div>
     </ConceptSheetProvider>
   )

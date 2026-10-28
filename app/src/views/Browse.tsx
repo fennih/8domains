@@ -196,7 +196,10 @@ export function Browse({ kb }: { kb: Kb }) {
 
   return (
     <div className="mx-auto flex h-full max-w-xl flex-col md:max-w-4xl md:px-8 xl:max-w-6xl gap-4 overflow-y-auto px-4 py-6">
-      <h1 className="text-2xl font-bold">Browse</h1>
+      <a href="#home" className="-mb-2 inline-flex min-h-11 items-center self-start text-sm font-semibold text-muted hover:text-fg">
+        &larr; Home
+      </a>
+      <h1 className="text-2xl">Browse</h1>
       <div>
         <label htmlFor="browse-search" className="sr-only">
           Search concepts, flashcards and tables

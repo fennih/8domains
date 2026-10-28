@@ -147,7 +147,10 @@ export function Coverage({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s:
 
   return (
     <div className="mx-auto flex h-full max-w-5xl flex-col gap-6 overflow-y-auto px-4 py-6 md:px-8">
-      <h1 className="text-3xl font-extrabold md:text-4xl">Coverage</h1>
+      <a href="#home" className="-mb-2 inline-flex min-h-11 items-center self-start text-sm font-semibold text-muted hover:text-fg">
+        &larr; Home
+      </a>
+      <h1 className="text-3xl md:text-4xl">Coverage</h1>
 
       <section aria-label="Overall coverage" className="grid gap-3 md:grid-cols-2">
         <div className="d-1 tile flex items-center gap-4 p-4">

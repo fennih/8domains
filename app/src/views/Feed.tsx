@@ -4,6 +4,7 @@ import { FlashcardCard } from '../components/cards/FlashcardCard'
 import { QuizCard } from '../components/cards/QuizCard'
 import { RecallCard } from '../components/cards/RecallCard'
 import { StoryCard } from '../components/cards/StoryCard'
+import { Logo } from '../components/Nav'
 import { TableCard } from '../components/cards/TableCard'
 import { computeCoverage, nextObjective } from '../lib/coverage'
 import { buildBatch, type FeedItem } from '../lib/feed'
@@ -190,7 +191,12 @@ export function Feed({ kb, scope, visible, onPick, onHome }: { kb: Kb; scope: Sc
   }
 
   useActiveKeys(visible, (e) => {
-    if (e.key === 'ArrowDown' || e.key === 'j') {
+    if (e.key === 'Escape') {
+      // An open dialog (concept sheet) handles its own Escape.
+      if (document.querySelector('dialog[open]')) return
+      e.preventDefault()
+      onHome()
+    } else if (e.key === 'ArrowDown' || e.key === 'j') {
       e.preventDefault()
       goTo(Math.min(active + 1, slots.length))
     } else if (e.key === 'ArrowUp' || e.key === 'k') {
@@ -220,8 +226,20 @@ export function Feed({ kb, scope, visible, onPick, onHome }: { kb: Kb; scope: Sc
 
   return (
     <div className="flex h-full flex-col">
-      <div className="mx-auto flex w-full max-w-7xl shrink-0 items-center px-3 py-2 md:px-8">
+      <div className="mx-auto flex w-full max-w-7xl shrink-0 items-center gap-3 px-3 py-1.5 md:px-8 desk:px-10 desk:pt-4">
+        <Logo className="hidden text-xl desk:block" />
         <ScopeChip kb={kb} scope={scope} onClick={onHome} />
+        <button
+          type="button"
+          onClick={onHome}
+          aria-label="Close story"
+          className="ml-auto inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[10px] text-sm font-bold text-muted hover:text-fg desk:border desk:border-line desk:px-3.5"
+        >
+          <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+          <span className="hidden desk:inline">Close</span>
+        </button>
       </div>
       <div ref={scrollRef} className="feed min-h-0 flex-1" aria-label="Study feed" role="feed" aria-busy={slots.length === 0 && !exhausted}>
         {slots.map((s, i) => (

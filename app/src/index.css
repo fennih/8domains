@@ -425,13 +425,18 @@ strong {
   padding-right: env(safe-area-inset-right);
 }
 
-@media (min-width: 768px) {
+.app-main-full {
+  height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+}
+
+@media (min-width: 75rem) {
   .app-main {
     height: 100dvh;
   }
   .nav-bar {
     height: 100dvh;
-    padding: 1rem 0;
+    padding: 2rem 1.25rem;
   }
 }
 
