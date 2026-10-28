@@ -240,6 +240,57 @@ strong {
   background: var(--dc);
 }
 
+/* Story card: D+ sizes for phone; tablet and desktop steps are in the responsive block. */
+.story-card {
+  padding: 14px 18px 18px;
+}
+.story-segs {
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 3px;
+}
+.story-segs .seg {
+  height: 3px;
+}
+.story-body {
+  gap: 18px;
+}
+.story-kicker {
+  font-size: 13px;
+}
+.story-hook {
+  font-size: 38px;
+  line-height: 1.14;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.story-head {
+  font-size: 24px;
+  line-height: 1.2;
+}
+.story-text {
+  font-size: 22px;
+  line-height: 1.4;
+}
+.story-text-long {
+  font-size: 19px;
+}
+.bl.story-points {
+  font-size: 19px;
+  line-height: 1.4;
+  gap: 16px;
+}
+.story-sub {
+  font-size: 15px;
+  line-height: 1.35;
+}
+.kbd {
+  font-family: inherit;
+  padding: 1px 6px;
+  border: 1px solid var(--c-border);
+  border-radius: 5px;
+}
+
 /* Bullets: domain-colored dot, sub-bullets indented with a thin dash. */
 .bl {
   display: flex;

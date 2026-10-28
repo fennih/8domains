@@ -27,12 +27,13 @@ export function Label({ children }: { children: ReactNode }) {
   return <span className="text-xs font-bold uppercase tracking-wider text-muted">{children}</span>
 }
 
+// Neutral on purpose: marker colors carry meaning (fact, exam action, number) and are kept for highlights.
 const PILL_STYLE = {
   trap: 'bg-bad-soft text-danger',
-  manager: 'bg-[var(--hl-b)] text-[#1b1a20]',
-  mnemonic: 'bg-[var(--hl-y)] text-[#1b1a20]',
-  point: 'bg-surface-2 text-muted',
-  recall: 'bg-[var(--hl-g)] text-[#1b1a20]',
+  manager: 'border border-line text-fg-2',
+  mnemonic: 'border border-line text-fg-2',
+  point: 'border border-line text-muted',
+  recall: 'border border-line text-fg-2',
 } as const
 
 export function Pill({ kind, children }: { kind: keyof typeof PILL_STYLE; children: ReactNode }) {

@@ -4,7 +4,6 @@ import { conceptStory, type Screen } from '../../lib/beats'
 import { useActiveKeys } from '../../lib/keys'
 import { useProgress } from '../../lib/progress'
 import { Bullets } from '../Bullets'
-import { DomainChip, Pill } from '../Chips'
 import { Inline } from '../Inline'
 import { useOpenConcept } from '../openConcept'
 import { CardShell } from './CardShell'
@@ -12,43 +11,55 @@ import { CardShell } from './CardShell'
 const SWIPE_MIN = 40
 const SWIPE_RATIO = 1.5
 
+const SCREEN_LABEL = { summary: 'In short', points: 'Key points', traps: 'Exam traps', manager: 'Manager view', mnemonic: 'Mnemonic' } as const
+
+// Every screen after the hook opens with the concept title in Spectral and a small muted label.
+function ScreenHead({ title, label }: { title: string; label: string }) {
+  return (
+    <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 desk:gap-x-3.5">
+      <span className="story-head font-display font-medium">{title}</span>
+      <span className={`text-xs font-bold uppercase tracking-[0.08em] desk:text-[13px] ${label === 'Exam traps' ? 'text-danger' : 'text-muted'}`}>{label}</span>
+    </div>
+  )
+}
+
 function ScreenBody({ screen, reveal, title }: { screen: Screen; reveal: number; title: string }) {
   switch (screen.kind) {
     case 'hook':
       return (
         <>
-          <p className="text-sm font-bold uppercase tracking-wider text-dc-ink">{title}</p>
-          <p className="font-display text-[2rem] font-bold leading-[1.15] md:text-5xl">
+          <p className="story-kicker font-bold uppercase tracking-[0.08em] text-dc-ink">{title}</p>
+          <p className="story-hook font-display">
             <Inline text={screen.text} />
           </p>
         </>
       )
     case 'summary':
       return (
-        <p className={screen.text.length > 220 ? 'text-xl leading-snug md:text-3xl' : 'text-[1.45rem] leading-snug md:text-[2.1rem]'}>
-          <Inline text={screen.text} />
-        </p>
+        <>
+          <ScreenHead title={title} label={SCREEN_LABEL.summary} />
+          <p className={`story-text ${screen.text.length > 220 ? 'story-text-long' : ''}`}>
+            <Inline text={screen.text} />
+          </p>
+        </>
       )
     case 'points':
     case 'traps':
       return (
         <>
-          <Pill kind={screen.kind === 'traps' ? 'trap' : 'point'}>
-            {screen.kind === 'traps' ? 'Exam traps' : screen.parts > 1 ? `Key points ${screen.part}/${screen.parts}` : 'Key points'}
-          </Pill>
-          <Bullets
-            items={screen.items.slice(0, reveal)}
-            className="text-xl leading-snug md:text-[1.9rem] md:leading-snug"
-            subClassName="text-base md:text-2xl"
+          <ScreenHead
+            title={title}
+            label={screen.kind === 'traps' ? SCREEN_LABEL.traps : screen.parts > 1 ? `Key points ${screen.part}/${screen.parts}` : SCREEN_LABEL.points}
           />
+          <Bullets items={screen.items.slice(0, reveal)} className="story-points" subClassName="story-sub" />
         </>
       )
     case 'manager':
     case 'mnemonic':
       return (
         <>
-          <Pill kind={screen.kind}>{screen.kind === 'manager' ? 'Manager view' : 'Mnemonic'}</Pill>
-          <p className="text-[1.4rem] leading-snug md:text-[2.1rem]">
+          <ScreenHead title={title} label={SCREEN_LABEL[screen.kind]} />
+          <p className="story-text">
             <Inline text={screen.text} />
           </p>
         </>
@@ -56,8 +67,10 @@ function ScreenBody({ screen, reveal, title }: { screen: Screen; reveal: number;
   }
 }
 
+const arrowBase = 'inline-flex items-center justify-center font-bold disabled:opacity-40'
+
 export function StoryCard({ concept, active, onDone }: { concept: Concept; active: boolean; onDone: () => void }) {
-  const { state, markSeen, markRead } = useProgress()
+  const { markSeen, markRead } = useProgress()
   const openConcept = useOpenConcept()
   const { screens, steps } = useMemo(() => conceptStory(concept), [concept])
   const [index, setIndex] = useState(0)
@@ -66,7 +79,6 @@ export function StoryCard({ concept, active, onDone }: { concept: Concept; activ
   const swiped = useRef(false)
   const last = steps.length - 1
   const step = steps[index]!
-  const wasRead = state.read.has(concept.id)
 
   useEffect(() => {
     if (active) markSeen(concept.id)
@@ -126,30 +138,54 @@ export function StoryCard({ concept, active, onDone }: { concept: Concept; activ
     else next()
   }
 
+  const isLast = index === last
+  const prevLabel = 'Previous'
+  const nextLabel = isLast ? 'Next card' : 'Next'
+
   return (
-    <CardShell domain={concept.domain} label="Concept story" live={active}>
-      <div className="flex gap-1" role="progressbar" aria-label="Story progress" aria-valuemin={1} aria-valuemax={steps.length} aria-valuenow={index + 1}>
+    <CardShell
+      domain={concept.domain}
+      label="Concept story"
+      live={active}
+      prev={
+        <button type="button" onClick={prev} disabled={index === 0} aria-label={prevLabel} className={`${arrowBase} h-14 w-14 rounded-full border border-dc-edge text-xl text-fg`}>
+          <span aria-hidden="true">&larr;</span>
+        </button>
+      }
+      next={
+        <button type="button" onClick={next} aria-label={nextLabel} className={`${arrowBase} h-14 w-14 rounded-full bg-accent text-xl text-accent-fg`}>
+          <span aria-hidden="true">&rarr;</span>
+        </button>
+      }
+      below={
+        <p className="text-center text-[13px] text-muted">
+          <kbd className="kbd">&larr;</kbd> <kbd className="kbd">&rarr;</kbd> or <kbd className="kbd">Space</kbd> to move · <kbd className="kbd">Esc</kbd> to close · hold a
+          highlight for its meaning
+        </p>
+      }
+    >
+      <div className="story-segs grid" role="progressbar" aria-label="Story progress" aria-valuemin={1} aria-valuemax={steps.length} aria-valuenow={index + 1}>
         {steps.map((_, i) => (
-          <span key={i} className={`seg h-1 flex-1 rounded-full ${i <= index ? 'seg-on' : ''}`} />
+          <span key={i} className={`seg rounded-full ${i <= index ? 'seg-on' : ''}`} />
         ))}
       </div>
 
-      <header className="mt-3 flex items-center gap-2">
-        <DomainChip domain={concept.domain} label={`D${concept.domain}`} />
-        <span className="font-mono text-xs text-muted">{concept.objective}</span>
+      <header className="mt-1.5 flex items-center justify-between md:mt-2.5 desk:mt-4">
         <button
           type="button"
           onClick={() => openConcept(concept.id)}
-          className="min-w-0 flex-1 truncate text-left text-sm font-semibold text-muted hover:text-fg"
-          title="Open the full concept"
+          className="inline-flex min-h-11 items-center text-[13px] font-bold text-dc-ink md:text-[15px] desk:text-sm"
+          title={`Open the full concept: ${concept.title}`}
         >
-          {concept.title}
+          D{concept.domain} · {concept.objective}
         </button>
-        {wasRead && <span className="text-xs font-bold text-success">Read</span>}
+        <span className="hidden text-sm text-muted desk:inline" aria-hidden="true">
+          {index + 1} / {steps.length}
+        </span>
       </header>
 
       <div
-        className="stage relative flex flex-1 cursor-pointer items-center justify-center py-4"
+        className="stage relative flex flex-1 cursor-pointer items-center py-4 desk:py-6"
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
         onPointerCancel={() => {
@@ -157,33 +193,22 @@ export function StoryCard({ concept, active, onDone }: { concept: Concept; activ
         }}
         onClick={onClick}
       >
-        <div className="w-full max-w-3xl" aria-live={active ? 'polite' : 'off'}>
-          <div key={step.screen} className={`beat-${dir} flex flex-col gap-4`}>
+        <div className="w-full" aria-live={active ? 'polite' : 'off'}>
+          <div key={step.screen} className={`beat-${dir} story-body flex flex-col`}>
             <ScreenBody screen={screens[step.screen]!} reveal={step.reveal} title={concept.title} />
           </div>
         </div>
       </div>
 
-      <footer className="flex items-center justify-between gap-3">
-        <button
-          type="button"
-          onClick={prev}
-          disabled={index === 0}
-          aria-label="Previous"
-          className="rounded-full border border-line bg-surface px-4 py-2 text-sm font-bold disabled:opacity-40"
-        >
-          &larr;
+      <footer className="flex items-center justify-between gap-3 desk:hidden">
+        <button type="button" onClick={prev} disabled={index === 0} aria-label={prevLabel} className={`${arrowBase} min-h-11 min-w-12 rounded-[10px] border border-dc-edge text-fg md:min-h-[52px] md:min-w-14 md:text-lg`}>
+          <span aria-hidden="true">&larr;</span>
         </button>
-        <span className="text-xs text-muted" aria-hidden="true">
+        <span className="text-xs text-muted md:text-sm" aria-hidden="true">
           {index + 1} / {steps.length}
         </span>
-        <button
-          type="button"
-          onClick={next}
-          aria-label={index === last ? 'Next card' : 'Next'}
-          className="rounded-full bg-accent px-5 py-2 text-sm font-bold text-accent-fg"
-        >
-          {index === last ? 'Next card' : <span aria-hidden="true">&rarr;</span>}
+        <button type="button" onClick={next} aria-label={nextLabel} className={`${arrowBase} min-h-11 min-w-16 rounded-[10px] bg-accent px-3 text-accent-fg md:min-h-[52px] md:min-w-20 md:text-lg`}>
+          {isLast ? 'Next card' : <span aria-hidden="true">&rarr;</span>}
         </button>
       </footer>
     </CardShell>
