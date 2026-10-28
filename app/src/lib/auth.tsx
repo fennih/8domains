@@ -1,7 +1,9 @@
 import { ClerkProvider, useAuth, useClerk } from '@clerk/react'
 import { useEffect, type ReactNode } from 'react'
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined
+const RAW_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined
+// Anything that is not a Clerk key (unset, empty, "none") builds without accounts.
+const PUBLISHABLE_KEY = RAW_KEY?.startsWith('pk_') ? RAW_KEY : undefined
 
 // The hosted build always sets the key; local dev and forks without one run with no accounts.
 export const AUTH_ENABLED = Boolean(PUBLISHABLE_KEY)
