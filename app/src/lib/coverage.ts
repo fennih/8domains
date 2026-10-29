@@ -111,13 +111,20 @@ export interface Challenge {
   count: Count
 }
 
-// Challenges are derived from the data only: the objective in progress, its flashcards,
-// the domain in focus and the whole outline. Completed objectives are listed as quiet checks.
+// The objective to read next: the focus if it is already in progress, otherwise the first
+// objective with unread content in outline order, so falling behind the plan never skips material.
+function readingTarget(cov: Coverage, focusObjective?: string): ObjectiveCoverage | undefined {
+  const focus = focusObjective ? cov.objectives.get(focusObjective) : undefined
+  if (focus?.state === 'reading') return focus
+  return [...cov.objectives.values()].find((o) => o.state === 'not-started' || o.state === 'reading')
+}
+
+// Challenges are derived from the data only: the next objective to read, its flashcards,
+// one breadth goal and the whole outline. Completed objectives are listed as quiet checks.
 export function challenges(cov: Coverage, focusObjective?: string): { open: Challenge[]; done: Challenge[] } {
   const open: Challenge[] = []
   const done: Challenge[] = []
-  const reading = [...cov.objectives.values()].filter((o) => o.state === 'reading')
-  const focus = (focusObjective && cov.objectives.get(focusObjective)) || reading[0] || [...cov.objectives.values()].find((o) => o.state === 'not-started')
+  const focus = readingTarget(cov, focusObjective)
 
   if (focus && focus.concepts.total > 0 && focus.concepts.done < focus.concepts.total)
     open.push({ id: `read-${focus.id}`, label: `Read all of ${focus.id}`, count: focus.concepts })
@@ -127,16 +134,22 @@ export function challenges(cov: Coverage, focusObjective?: string): { open: Chal
     .sort((a, b) => b.concepts.done / b.concepts.total - a.concepts.done / a.concepts.total)[0]
   if (cardsTarget) open.push({ id: `cards-${cardsTarget.id}`, label: `Learn all flashcards of ${cardsTarget.id}`, count: cardsTarget.cards })
 
-  const domainNo = focus?.domain ?? 1
-  const d = cov.domains.get(domainNo)
-  if (d && d.concepts.total > 0) {
-    const ch = { id: `domain-${domainNo}`, label: `Full coverage: Domain ${domainNo}`, count: d.concepts }
-    if (d.concepts.done < d.concepts.total) open.push(ch)
+  // Breadth: touch every domain first, then finish the domain you are furthest into.
+  const withContent = [...cov.domains].filter(([, d]) => d.concepts.total > 0)
+  const touched = { done: withContent.filter(([, d]) => d.concepts.done > 0).length, total: withContent.length }
+  if (touched.done < touched.total) {
+    open.push({ id: 'breadth', label: 'Read something in every domain', count: touched })
+  } else {
+    const best = withContent
+      .filter(([, d]) => d.concepts.done < d.concepts.total)
+      .sort(([, a], [, b]) => b.concepts.done / b.concepts.total - a.concepts.done / a.concepts.total)[0]
+    if (best) open.push({ id: `domain-${best[0]}`, label: `Full coverage: Domain ${best[0]}`, count: best[1].concepts })
   }
   open.push({ id: 'outline', label: 'Full outline coverage', count: cov.outline })
 
   for (const o of cov.objectives.values())
     if (o.state === 'read' || o.state === 'mastered') done.push({ id: `read-${o.id}`, label: `Read all of ${o.id}`, count: o.concepts })
+  if (touched.total > 0 && touched.done === touched.total) done.push({ id: 'breadth', label: 'Read something in every domain', count: touched })
   for (const [n, dc] of cov.domains)
     if (dc.concepts.total > 0 && dc.concepts.done === dc.concepts.total)
       done.push({ id: `domain-${n}`, label: `Full coverage: Domain ${n}`, count: dc.concepts })
