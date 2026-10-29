@@ -21,7 +21,7 @@ dist/
 docs/hardening.md
 app/public/kb/
 
-# Study content: a clone of the private fennih/8domains-content
+# Study content, kept private; example-content/ is the public placeholder
 content/
 
 # Cloudflare Workers

@@ -18,21 +18,25 @@ Progress never leaves the browser. The Worker serves the landing and gates `/app
 ## Run
 
 ```sh
-git clone https://github.com/fennih/8domains-content.git content   # private
 make dev       # app on localhost, no sign-in
 make build     # landing + app in dist/
 make preview   # Worker against dist/, keys in worker/.dev.vars
 ```
 
-Needs [bun](https://bun.sh) and [uv](https://docs.astral.sh/uv/). The study content lives in a private repo.
+Needs [bun](https://bun.sh) and [uv](https://docs.astral.sh/uv/). Out of the box the app runs on [`example-content/`](example-content): lorem ipsum in the real format.
+
+## Content
+
+The study content is not published here. It is still under editorial review: every concept is cross-checked against several study guides and revised as the review goes on, so it is released only inside the app, where there is one reviewed, current version instead of copies going stale.
 
 ## Layout
 
 ```
-app/        React PWA
-landing/    static landing, privacy page, security.txt
-worker/     Cloudflare Worker: assets, session gate, security headers
-pipeline/   compiles content/ into the app's JSON
+app/              React PWA
+landing/          static landing, privacy page, security.txt
+worker/           Cloudflare Worker: assets, session gate, security headers
+pipeline/         compiles content into the app's JSON
+example-content/  placeholder content in the real format
 ```
 
 ## License

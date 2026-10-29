@@ -1,0 +1,189 @@
+{
+  "exam": "ISC2 CISSP",
+  "outlineVersion": "2024-04-15",
+  "format": {
+    "type": "CAT",
+    "minQuestions": 100,
+    "maxQuestions": 150,
+    "minutes": 180,
+    "passingScore": 700
+  },
+  "domains": [
+    {
+      "id": "d1",
+      "number": 1,
+      "title": "Security and Risk Management",
+      "weight": 16,
+      "objectives": [
+        {
+          "id": "1.1",
+          "title": "Lorem ipsum",
+          "topics": [
+            {
+              "id": "1.1.1",
+              "title": "Lorem ipsum dolor"
+            },
+            {
+              "id": "1.1.2",
+              "title": "Sit amet consectetur"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d2",
+      "number": 2,
+      "title": "Asset Security",
+      "weight": 10,
+      "objectives": [
+        {
+          "id": "2.1",
+          "title": "Dolor sit amet",
+          "topics": [
+            {
+              "id": "2.1.1",
+              "title": "Lorem ipsum dolor"
+            },
+            {
+              "id": "2.1.2",
+              "title": "Sit amet consectetur"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d3",
+      "number": 3,
+      "title": "Security Architecture and Engineering",
+      "weight": 13,
+      "objectives": [
+        {
+          "id": "3.1",
+          "title": "Consectetur adipiscing",
+          "topics": [
+            {
+              "id": "3.1.1",
+              "title": "Lorem ipsum dolor"
+            },
+            {
+              "id": "3.1.2",
+              "title": "Sit amet consectetur"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d4",
+      "number": 4,
+      "title": "Communication and Network Security",
+      "weight": 13,
+      "objectives": [
+        {
+          "id": "4.1",
+          "title": "Sed do eiusmod",
+          "topics": [
+            {
+              "id": "4.1.1",
+              "title": "Lorem ipsum dolor"
+            },
+            {
+              "id": "4.1.2",
+              "title": "Sit amet consectetur"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d5",
+      "number": 5,
+      "title": "Identity and Access Management (IAM)",
+      "weight": 13,
+      "objectives": [
+        {
+          "id": "5.1",
+          "title": "Tempor incididunt",
+          "topics": [
+            {
+              "id": "5.1.1",
+              "title": "Lorem ipsum dolor"
+            },
+            {
+              "id": "5.1.2",
+              "title": "Sit amet consectetur"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d6",
+      "number": 6,
+      "title": "Security Assessment and Testing",
+      "weight": 12,
+      "objectives": [
+        {
+          "id": "6.1",
+          "title": "Ut labore et dolore",
+          "topics": [
+            {
+              "id": "6.1.1",
+              "title": "Lorem ipsum dolor"
+            },
+            {
+              "id": "6.1.2",
+              "title": "Sit amet consectetur"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d7",
+      "number": 7,
+      "title": "Security Operations",
+      "weight": 13,
+      "objectives": [
+        {
+          "id": "7.1",
+          "title": "Magna aliqua",
+          "topics": [
+            {
+              "id": "7.1.1",
+              "title": "Lorem ipsum dolor"
+            },
+            {
+              "id": "7.1.2",
+              "title": "Sit amet consectetur"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d8",
+      "number": 8,
+      "title": "Software Development Security",
+      "weight": 10,
+      "objectives": [
+        {
+          "id": "8.1",
+          "title": "Ut enim ad minim",
+          "topics": [
+            {
+              "id": "8.1.1",
+              "title": "Lorem ipsum dolor"
+            },
+            {
+              "id": "8.1.2",
+              "title": "Sit amet consectetur"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

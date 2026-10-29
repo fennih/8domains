@@ -1,0 +1,15 @@
+- id: d1-q001
+  objective: "1.1"
+  concepts: [d1-lorem-ipsum]
+  style: manager
+  difficulty: 1
+  stem: >-
+    A layout needs text before the copy is ready. What should the designer use FIRST?
+  options:
+    - Lorem ipsum placeholder text
+    - The final marketing copy
+    - An empty frame
+    - A screenshot of another site
+  answer: A
+  explanation: >-
+    Placeholder text shows ==g:the real shape of the layout== without waiting for the copy.

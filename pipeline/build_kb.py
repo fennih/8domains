@@ -1,7 +1,8 @@
-"""Compile content/ (Markdown + YAML) into validated JSON for the app under app/public/kb/."""
+"""Compile the content directory (Markdown + YAML) into validated JSON for the app under app/public/kb/."""
 
 import hashlib
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -10,7 +11,8 @@ import yaml
 from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parent.parent
-CONTENT = ROOT / "content"
+CONTENT = Path(os.environ.get("KB_CONTENT") or ROOT / "content").resolve()
+SCHEMA = ROOT / "pipeline" / "kb.schema.json"
 OUT = ROOT / "app" / "public" / "kb"
 
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n(.*)\Z", re.S)
@@ -217,7 +219,7 @@ def cross_check(files: dict[str, dict], outline: dict) -> list[str]:
 
 def main() -> int:
     outline = json.loads((CONTENT / "outline.json").read_text(encoding="utf-8"))
-    validator = Draft202012Validator(json.loads((CONTENT / "schema" / "kb.schema.json").read_text()))
+    validator = Draft202012Validator(json.loads(SCHEMA.read_text()))
     files: dict[str, dict] = {}
     errors: list[str] = []
     try:

@@ -1,5 +1,8 @@
 PY = cd pipeline && uv run python -I
 
+# The private study content when cloned into content/, otherwise the public placeholder set.
+CONTENT ?= $(if $(wildcard content/outline.json),content,example-content)
+
 FONTS = app/node_modules/@fontsource-variable
 SPECTRAL = app/node_modules/@fontsource/spectral/files
 
@@ -8,8 +11,8 @@ SPECTRAL = app/node_modules/@fontsource/spectral/files
 extract:   ## extract local books in resources/ into sources/extracted (gitignored)
 	$(PY) extract.py
 
-kb:        ## compile and validate content/ into app/public/kb
-	$(PY) build_kb.py
+kb:        ## compile and validate $(CONTENT) into app/public/kb
+	cd pipeline && KB_CONTENT=$(abspath $(CONTENT)) uv run python -I build_kb.py
 
 overlap:   ## flag generated text too close to local sources (maintainers only)
 	$(PY) overlap_check.py
