@@ -29,8 +29,12 @@ def book_id(path: Path) -> str | None:
 
 def html_to_md(html: bytes) -> str:
     soup = BeautifulSoup(html, "html.parser")
-    for tag in soup(["script", "style", "img", "figure"]):
+    for tag in soup(["script", "style", "img"]):
         tag.decompose()
+    # Some books wrap tables in <figure>; keep those, drop image-only figures.
+    for tag in soup("figure"):
+        if not tag.find("table"):
+            tag.decompose()
     lines: list[str] = []
     for el in soup.find_all(["h1", "h2", "h3", "h4", "p", "li", "tr", "pre"]):
         if el.find_parent(["li", "tr"]) and el.name in ("p", "li"):
