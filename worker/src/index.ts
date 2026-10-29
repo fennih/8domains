@@ -72,6 +72,11 @@ export default {
   async fetch(request, env): Promise<Response> {
     // Requests that match no public asset also reach the Worker; only /app is ours.
     const { pathname } = new URL(request.url)
+    // Asset uploads skip dot-directories, so the RFC 9116 path is mapped here to /security.txt.
+    if (pathname === '/.well-known/security.txt') {
+      const asset = await env.ASSETS.fetch(new Request(new URL('/security.txt', request.url), request))
+      return respond(asset.body, asset.status, { 'Content-Type': 'text/plain; charset=utf-8' })
+    }
     if (pathname !== '/app' && !pathname.startsWith('/app/')) return respond('Not found', 404)
 
     if (env.AUTH_DISABLED === 'true') return serveApp(request, env, appCsp(null))
