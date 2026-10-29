@@ -16,6 +16,9 @@ dist/
 .env
 .env.*
 .DS_Store
+
+# Dashboard hardening checklist: lists open gaps, kept out of the public repo
+docs/hardening.md
 app/public/kb/
 
 # Cloudflare Workers

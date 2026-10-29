@@ -183,6 +183,10 @@ export function Me({ kb }: { kb: Kb }) {
           <a href="https://github.com/fennih/8domains" className="underline underline-offset-2 hover:text-fg">
             Open source
           </a>
+          {' · '}
+          <a href="/privacy" className="underline underline-offset-2 hover:text-fg">
+            Privacy
+          </a>
           . No ads, no tracking. CISSP® is a registered certification mark of ISC2, Inc.; 8Domains is not affiliated with or endorsed by ISC2.
         </p>
       </footer>
