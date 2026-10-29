@@ -21,6 +21,9 @@ dist/
 docs/hardening.md
 app/public/kb/
 
+# Study content: a clone of the private fennih/8domains-content
+content/
+
 # Cloudflare Workers
 .dev.vars
 .wrangler/

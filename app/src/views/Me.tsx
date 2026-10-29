@@ -181,7 +181,7 @@ export function Me({ kb }: { kb: Kb }) {
         <p>Content version {kb.version} · ISC2 outline {kb.outline.outlineVersion}</p>
         <p>
           <a href="https://github.com/fennih/8domains" className="underline underline-offset-2 hover:text-fg">
-            Open source
+            Source code
           </a>
           {' · '}
           <a href="/privacy" className="underline underline-offset-2 hover:text-fg">
