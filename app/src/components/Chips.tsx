@@ -1,10 +1,28 @@
 import type { ReactNode } from 'react'
-import type { Priority } from '../kb/types'
+import type { Kb, Priority } from '../kb/types'
+import { DOMAIN_SHORT } from '../lib/domains'
 
 export function DomainChip({ domain, label }: { domain: number; label?: string }) {
   return (
     <span className={`chip-domain d-${domain} inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold`}>
       {label ?? (domain > 0 ? `Domain ${domain}` : 'All domains')}
+    </span>
+  )
+}
+
+// Where a card sits in the syllabus: domain name on top, objective number and title under it.
+export function CardContext({ kb, domain, objective }: { kb: Kb; domain: number; objective?: string }) {
+  const o = objective ? kb.outline.domains.find((d) => d.number === domain)?.objectives.find((x) => x.id === objective) : undefined
+  return (
+    <span className={`flex min-w-0 flex-col text-left leading-snug`}>
+      <span className="truncate text-xs font-bold uppercase tracking-[0.08em] text-dc-ink desk:text-[13px]">
+        {domain > 0 ? `Domain ${domain} · ${DOMAIN_SHORT[domain]}` : 'All domains'}
+      </span>
+      {o && (
+        <span className="truncate text-[13px] text-muted md:text-sm">
+          <span className="font-bold tabular-nums">{o.id}</span> {o.title}
+        </span>
+      )}
     </span>
   )
 }

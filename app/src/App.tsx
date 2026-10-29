@@ -15,6 +15,7 @@ import { Coverage } from './views/Coverage'
 import { Feed } from './views/Feed'
 import { Home } from './views/Home'
 import { Me } from './views/Me'
+import { btnPrimary } from './components/buttons'
 
 // The app always opens on Home (never straight into content); other tabs survive a reload.
 function tabFromHash(): Tab {
@@ -100,7 +101,7 @@ export function App() {
       <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
         <p>Could not load study content.</p>
         <p className="text-sm text-muted">{error}</p>
-        <button type="button" onClick={load} className="rounded-full bg-accent px-5 py-2 font-semibold text-accent-fg">
+        <button type="button" onClick={load} className={btnPrimary}>
           Retry
         </button>
       </div>

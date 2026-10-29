@@ -39,19 +39,19 @@ export function ConceptSheetProvider({ kb, children }: { kb: Kb; children: React
             <div className="mb-3 flex items-center justify-between gap-2">
               <div className="flex flex-wrap items-center gap-2">
                 <DomainChip domain={concept.domain} />
-                <span className="text-xs font-mono text-muted">{concept.objective}</span>
+                <span className="text-xs font-bold tabular-nums text-muted">{concept.objective}</span>
                 <PriorityBadge priority={concept.priority} />
               </div>
               <button
                 type="button"
                 onClick={() => setConceptId(null)}
-                className="rounded-full border border-line px-3 py-1 text-sm"
+                className="min-h-11 rounded-[10px] border border-line px-4 text-sm font-bold hover:border-muted"
                 aria-label="Close concept"
               >
                 Close
               </button>
             </div>
-            <h2 id="concept-sheet-title" className="mb-3 text-xl font-bold">
+            <h2 id="concept-sheet-title" className="mb-3 text-xl font-medium">
               {concept.title}
             </h2>
             <ConceptBody concept={concept} kb={kb} expanded />

@@ -3,3 +3,5 @@ const base = 'inline-flex min-h-[46px] items-center justify-center rounded-[10px
 
 export const btnPrimary = `${base} bg-accent text-accent-fg`
 export const btnSecondary = `${base} border border-line bg-surface text-fg hover:border-muted`
+export const btnDomain = `${base} border border-dc-edge bg-surface text-dc-ink hover:border-dc`
+export const btnDanger = `${base} border border-danger bg-surface text-danger`

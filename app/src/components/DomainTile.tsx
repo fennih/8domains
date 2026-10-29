@@ -24,7 +24,7 @@ export function DomainRing({ domain, value, className = '' }: { domain: number; 
           />
         )}
       </svg>
-      <span aria-hidden="true" className="ring-num font-display italic text-dc-ink">
+      <span aria-hidden="true" className="ring-num font-display text-dc-ink">
         {domain}
       </span>
     </span>

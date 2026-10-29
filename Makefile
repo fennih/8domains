@@ -23,8 +23,7 @@ build: kb  ## landing at /, app at /app/, assembled in dist/ for the Worker
 	cp -R landing/. dist/
 	cp -R app/dist dist/app
 	cp app/public/icon.svg dist/
-	cp $(SPECTRAL)/spectral-latin-400-normal.woff2 $(SPECTRAL)/spectral-latin-400-italic.woff2 \
-	   $(SPECTRAL)/spectral-latin-500-normal.woff2 $(SPECTRAL)/spectral-latin-500-italic.woff2 \
+	cp $(SPECTRAL)/spectral-latin-400-normal.woff2 $(SPECTRAL)/spectral-latin-500-normal.woff2 \
 	   $(FONTS)/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-wght-normal.woff2 dist/fonts/
 
 preview: build  ## run the Worker locally against dist/ (needs worker/.dev.vars)

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent } from 'react'
-import { itemSubs, itemText, type Concept } from '../../kb/types'
+import { itemSubs, itemText, type Concept, type Kb } from '../../kb/types'
 import { conceptStory, type Screen } from '../../lib/beats'
 import { useActiveKeys } from '../../lib/keys'
 import { highlightColors, type HighlightColor } from '../../lib/markup'
 import { useProgress } from '../../lib/progress'
 import { Bullets } from '../Bullets'
+import { CardContext } from '../Chips'
 import { HighlightLegend } from '../HighlightLegend'
 import { Inline } from '../Inline'
 import { useOpenConcept } from '../openConcept'
@@ -81,7 +82,7 @@ function screenText(screen: Screen, reveal: number): string {
 
 const arrowBase = 'inline-flex items-center justify-center font-bold disabled:opacity-40'
 
-export function StoryCard({ concept, active, onDone }: { concept: Concept; active: boolean; onDone: () => void }) {
+export function StoryCard({ concept, kb, active, onDone }: { concept: Concept; kb: Kb; active: boolean; onDone: () => void }) {
   const { state, markSeen, markRead, updateSettings } = useProgress()
   const openConcept = useOpenConcept()
   const { screens, steps } = useMemo(() => conceptStory(concept), [concept])
@@ -195,16 +196,16 @@ export function StoryCard({ concept, active, onDone }: { concept: Concept; activ
         ))}
       </div>
 
-      <header className="mt-1.5 flex items-center justify-between md:mt-2.5 desk:mt-4">
+      <header className="mt-1.5 flex items-center justify-between gap-4 md:mt-2.5 desk:mt-4">
         <button
           type="button"
           onClick={() => openConcept(concept.id)}
-          className="inline-flex min-h-11 items-center text-[13px] font-bold text-dc-ink md:text-[15px] desk:text-sm"
+          className="flex min-h-11 min-w-0 items-center hover:opacity-80"
           title={`Open the full concept: ${concept.title}`}
         >
-          D{concept.domain} · {concept.objective}
+          <CardContext kb={kb} domain={concept.domain} objective={concept.objective} />
         </button>
-        <span className="hidden text-sm text-muted desk:inline" aria-hidden="true">
+        <span className="hidden shrink-0 text-sm text-muted desk:inline" aria-hidden="true">
           {index + 1} / {steps.length}
         </span>
       </header>

@@ -5,7 +5,7 @@ import { flashcardDomain } from '../../kb/types'
 import { formatInterval } from '../../lib/dates'
 import { useActiveKeys } from '../../lib/keys'
 import { useProgress } from '../../lib/progress'
-import { DomainChip, Label } from '../Chips'
+import { CardContext, Label } from '../Chips'
 import { Inline } from '../Inline'
 import { useOpenConcept } from '../openConcept'
 import { CardShell } from './CardShell'
@@ -50,14 +50,16 @@ export function FlashcardCard({ card, kb, active }: { card: Flashcard; kb: Kb; a
 
   return (
     <CardShell domain={domain} label="Flashcard" live={active}>
-      <div className="flex flex-wrap items-center gap-2">
-        <DomainChip domain={domain} label={`D${domain}`} />
-        <Label>{TYPE_LABEL[card.type]}</Label>
-        {concept && (
-          <button type="button" onClick={() => openConcept(concept.id)} className="min-w-0 flex-1 truncate text-right text-sm text-muted hover:text-fg">
-            {concept.title}
-          </button>
-        )}
+      <div className="flex items-start justify-between gap-4">
+        <CardContext kb={kb} domain={domain} objective={concept?.objective} />
+        <span className="flex min-w-0 flex-col items-end gap-0.5">
+          <Label>{TYPE_LABEL[card.type]}</Label>
+          {concept && (
+            <button type="button" onClick={() => openConcept(concept.id)} className="max-w-full truncate text-right text-[13px] text-muted hover:text-fg md:text-sm">
+              {concept.title}
+            </button>
+          )}
+        </span>
       </div>
       <button
         type="button"
@@ -65,7 +67,7 @@ export function FlashcardCard({ card, kb, active }: { card: Flashcard; kb: Kb; a
         aria-expanded={flipped}
         className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-6 rounded-2xl text-left"
       >
-        <span className="font-display text-[1.75rem] font-bold leading-tight md:text-5xl">
+        <span className="font-display text-[1.75rem] font-medium leading-tight md:text-5xl">
           <Inline text={card.front} />
         </span>
         {flipped ? (

@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import type { KbTable } from '../../kb/types'
+import type { Kb, KbTable } from '../../kb/types'
 import { useActiveKeys } from '../../lib/keys'
 import { useMediaQuery } from '../../lib/media'
-import { DomainChip, Label } from '../Chips'
+import { CardContext, Label } from '../Chips'
 import { Inline } from '../Inline'
 import { CardShell } from './CardShell'
+import { btnPrimary, btnSecondary } from '../buttons'
 
 export function DataTable({ table, rows = table.rows.length }: { table: KbTable; rows?: number }) {
   return (
@@ -41,7 +42,7 @@ function RowCards({ table, rows }: { table: KbTable; rows: number }) {
     <ol className="flex flex-col gap-2" aria-label={`${table.title} rows`}>
       {table.rows.slice(0, rows).map((row, r) => (
         <li key={r} className="reveal rounded-2xl border border-line bg-surface p-3">
-          <p className="font-display text-lg font-bold leading-snug">
+          <p className="font-display text-lg font-medium leading-snug">
             <Inline text={row[0] ?? ''} />
           </p>
           <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm leading-snug">
@@ -60,7 +61,7 @@ function RowCards({ table, rows }: { table: KbTable; rows: number }) {
   )
 }
 
-export function TableCard({ table, active }: { table: KbTable; active: boolean }) {
+export function TableCard({ table, kb, active }: { table: KbTable; kb: Kb; active: boolean }) {
   const wide = useMediaQuery('(min-width: 768px)')
   const [shown, setShown] = useState(1)
   const total = table.rows.length
@@ -76,11 +77,11 @@ export function TableCard({ table, active }: { table: KbTable; active: boolean }
 
   return (
     <CardShell domain={table.domain ?? 0} label="Must-memorize table" live={active}>
-      <div className="flex flex-wrap items-center gap-2">
-        <DomainChip domain={table.domain ?? 0} label={table.domain ? `D${table.domain}` : 'All'} />
+      <div className="flex items-start justify-between gap-4">
+        <CardContext kb={kb} domain={table.domain ?? 0} objective={table.objective} />
         <Label>Must memorize</Label>
       </div>
-      <h2 className="mt-3 text-2xl font-bold leading-tight md:text-4xl">{table.title}</h2>
+      <h2 className="mt-3 text-2xl font-medium leading-tight md:text-4xl">{table.title}</h2>
       {table.description && (
         <p className="mt-1 text-sm text-muted md:text-base">
           <Inline text={table.description} />
@@ -92,10 +93,10 @@ export function TableCard({ table, active }: { table: KbTable; active: boolean }
       <div className="mt-4 flex flex-wrap items-center gap-3">
         {!done ? (
           <>
-            <button type="button" onClick={more} className="rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-accent-fg">
+            <button type="button" onClick={more} className={btnPrimary}>
               Next row ({shown}/{total})
             </button>
-            <button type="button" onClick={() => setShown(total)} className="rounded-full border border-line px-4 py-2.5 text-sm font-semibold">
+            <button type="button" onClick={() => setShown(total)} className={btnSecondary}>
               Show all
             </button>
           </>

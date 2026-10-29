@@ -14,7 +14,7 @@ const NAV: { id: Tab; label: string }[] = [
 export function Logo({ className = '' }: { className?: string }) {
   return (
     <span className={`font-display font-medium tracking-[-0.01em] ${className}`}>
-      <em className="italic text-accent">8</em>Domains
+      <span className="text-accent">8</span>Domains
     </span>
   )
 }

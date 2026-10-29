@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { Kb } from '../kb/types'
-import { btnPrimary, btnSecondary } from '../components/buttons'
+import { btnDomain, btnPrimary, btnSecondary } from '../components/buttons'
 import { Bar } from '../components/Chips'
 import { DomainIcon, DomainRing, DomainTile } from '../components/DomainTile'
 import { computeCoverage, nextObjective, pct } from '../lib/coverage'
@@ -59,7 +59,7 @@ export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Sco
             const oc = cov.objectives.get(o.id)!
             return (
               <li key={o.id} className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3 md:p-4">
-                <span className="w-10 shrink-0 font-display text-base italic text-dc-ink">{o.id}</span>
+                <span className="w-10 shrink-0 text-sm font-bold tabular-nums text-dc-ink md:text-base">{o.id}</span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold leading-snug md:text-base">{o.title}</p>
                   {oc.concepts.total > 0 ? (
@@ -77,7 +77,7 @@ export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Sco
                   <button
                     type="button"
                     onClick={() => onPick({ kind: 'objective', objective: o.id })}
-                    className="min-h-11 shrink-0 rounded-[10px] border border-dc-edge px-3 text-sm font-bold text-dc-ink"
+                    className={`${btnDomain} shrink-0`}
                     aria-label={`Study ${o.id} ${o.title}`}
                   >
                     Study this
@@ -102,7 +102,7 @@ export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Sco
       <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <div className="flex flex-col gap-1">
           <h1 className="home-title leading-[1.05] tracking-[-0.015em]">
-            What do you want to <em className="italic text-accent">study</em>?
+            What do you want to <span className="text-accent">study</span>?
           </h1>
           {suggested && (
             <button

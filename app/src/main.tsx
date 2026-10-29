@@ -5,9 +5,7 @@ import { AuthProvider } from './lib/auth'
 import { applyStoredTheme } from './lib/theme'
 import '@fontsource-variable/atkinson-hyperlegible-next/wght.css'
 import '@fontsource/spectral/400.css'
-import '@fontsource/spectral/400-italic.css'
 import '@fontsource/spectral/500.css'
-import '@fontsource/spectral/500-italic.css'
 import './index.css'
 
 applyStoredTheme()

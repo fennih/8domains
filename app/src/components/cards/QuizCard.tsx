@@ -3,7 +3,7 @@ import type { Kb, Question } from '../../kb/types'
 import { useActiveKeys } from '../../lib/keys'
 import { useMediaQuery, WIDE } from '../../lib/media'
 import { useProgress } from '../../lib/progress'
-import { DomainChip, Label } from '../Chips'
+import { CardContext, Label } from '../Chips'
 import { Inline } from '../Inline'
 import { useOpenConcept } from '../openConcept'
 import { CardShell } from './CardShell'
@@ -41,7 +41,7 @@ export function QuizCard({ question, kb, active }: { question: Question; kb: Kb;
 
   const feedback = (
     <div className="reveal mt-4 flex flex-col gap-2" role="status">
-      <p className={`font-display text-lg font-bold ${correct ? 'text-success' : 'text-danger'} lg:text-2xl`}>
+      <p className={`font-display text-lg font-medium ${correct ? 'text-success' : 'text-danger'} lg:text-2xl`}>
         {correct ? 'Correct.' : `Not quite. The answer is ${LETTERS[question.answer]}.`}
       </p>
       <p className="text-sm leading-relaxed lg:text-base">
@@ -62,9 +62,8 @@ export function QuizCard({ question, kb, active }: { question: Question; kb: Kb;
 
   return (
     <CardShell domain={question.domain} label="Scenario question" live={active}>
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <DomainChip domain={question.domain} label={`D${question.domain}`} />
-        <span className="font-mono text-xs text-muted">{question.objective}</span>
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <CardContext kb={kb} domain={question.domain} objective={question.objective} />
         <Label>{question.style === 'manager' ? 'Think like a manager' : 'Scenario'}</Label>
       </div>
       <div className="flex flex-col lg:my-auto lg:grid lg:grid-cols-2 lg:gap-12">
@@ -84,7 +83,7 @@ export function QuizCard({ question, kb, active }: { question: Question; kb: Kb;
               aria-pressed={chosen === i}
               className={`flex gap-3 rounded-2xl border-2 px-4 py-3 text-left text-[0.98rem] leading-snug lg:px-5 lg:py-4 lg:text-lg ${optionClass(i)}`}
             >
-              <span className="font-display font-bold text-muted">{LETTERS[i]}</span>
+              <span className="font-display font-medium text-muted">{LETTERS[i]}</span>
               <span>
                 <Inline text={opt} />
               </span>

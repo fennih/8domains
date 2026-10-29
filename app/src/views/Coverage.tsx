@@ -6,6 +6,7 @@ import { daysBetween, startOfDay } from '../lib/dates'
 import type { Plan } from '../lib/plan'
 import { useProgress } from '../lib/progress'
 import type { Scope } from '../lib/scope'
+import { btnPrimary } from '../components/buttons'
 
 type View = { level: 'map' } | { level: 'domain'; domain: number } | { level: 'objective'; objective: string }
 
@@ -53,7 +54,7 @@ export function Coverage({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s:
     <button
       type="button"
       onClick={() => setView(view.level === 'objective' ? { level: 'domain', domain: Number(view.objective.split('.')[0]) } : { level: 'map' })}
-      className="self-start rounded-full border border-line bg-surface px-3 py-1 text-sm font-semibold"
+      className="min-h-11 self-start text-sm font-semibold text-muted hover:text-fg"
     >
       &larr; Back
     </button>
@@ -64,7 +65,7 @@ export function Coverage({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s:
     return (
       <div className={`d-${d.number} mx-auto flex h-full max-w-5xl flex-col gap-4 overflow-y-auto px-4 py-6 md:px-8`}>
         {back}
-        <h1 className="text-2xl font-bold md:text-3xl">
+        <h1 className="text-2xl font-medium md:text-3xl">
           {d.number}. {d.title}
         </h1>
         <ul className="flex flex-col gap-2">
@@ -107,7 +108,7 @@ export function Coverage({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s:
         <div className="flex items-start gap-3">
           <span className={`cell cell-${oc.state} flex h-10 w-14 shrink-0 items-center justify-center text-sm font-bold`}>{o.id}</span>
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-bold leading-snug md:text-2xl">{o.title}</h1>
+            <h1 className="text-xl font-medium leading-snug md:text-2xl">{o.title}</h1>
             <p className="text-sm text-muted">
               {STATE_LABEL[oc.state]}
               {oc.concepts.total > 0 && ` · ${oc.concepts.done}/${oc.concepts.total} concepts read · ${oc.cards.done}/${oc.cards.total} flashcards learned`}
@@ -115,7 +116,7 @@ export function Coverage({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s:
           </div>
         </div>
         {oc.concepts.total > 0 && (
-          <button type="button" onClick={() => onPick({ kind: 'objective', objective: o.id })} className="self-start rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-accent-fg">
+          <button type="button" onClick={() => onPick({ kind: 'objective', objective: o.id })} className={`${btnPrimary} self-start`}>
             Study {o.id}
           </button>
         )}
@@ -126,7 +127,7 @@ export function Coverage({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s:
             const ts = topicState(kb, t.id, state.read)
             return (
               <li key={t.id} className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-3">
-                <span className="w-12 shrink-0 font-mono text-xs text-muted">{t.id}</span>
+                <span className="w-12 shrink-0 text-xs font-bold tabular-nums text-muted">{t.id}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm leading-snug">{t.title}</span>
                   <span className="text-xs text-muted">
@@ -156,7 +157,7 @@ export function Coverage({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s:
         <div className="d-1 tile flex items-center gap-4 p-4">
           <Ring value={pct(cov.concepts)} size={60} />
           <div className="min-w-0 flex-1">
-            <p className="font-display text-2xl font-bold">
+            <p className="font-display text-2xl font-medium">
               {cov.concepts.done}/{cov.concepts.total}
             </p>
             <p className="text-sm text-muted">concepts read</p>
@@ -165,7 +166,7 @@ export function Coverage({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s:
         <div className="d-2 tile flex items-center gap-4 p-4">
           <Ring value={pct(cov.cards)} size={60} />
           <div className="min-w-0 flex-1">
-            <p className="font-display text-2xl font-bold">
+            <p className="font-display text-2xl font-medium">
               {cov.cards.done}/{cov.cards.total}
             </p>
             <p className="text-sm text-muted">flashcards learned</p>

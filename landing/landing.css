@@ -9,23 +9,9 @@
 }
 @font-face {
   font-family: 'Spectral';
-  src: url('/fonts/spectral-latin-400-italic.woff2') format('woff2');
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Spectral';
   src: url('/fonts/spectral-latin-500-normal.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Spectral';
-  src: url('/fonts/spectral-latin-500-italic.woff2') format('woff2');
-  font-weight: 500;
-  font-style: italic;
   font-display: swap;
 }
 @font-face {
@@ -163,7 +149,7 @@ a:focus-visible {
   align-items: center;
   min-height: 44px;
 }
-.logo em {
+.logo .accent {
   color: var(--accent);
 }
 .top-link {
@@ -191,7 +177,7 @@ a:focus-visible {
   line-height: 1.06;
   letter-spacing: -0.015em;
 }
-.hero h1 em {
+.hero h1 .accent {
   color: var(--accent);
 }
 .lead {
@@ -266,9 +252,20 @@ a:focus-visible {
 }
 .story-ref {
   margin-top: 14px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.4;
   color: var(--dc);
+}
+.story-ref span {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
 }
 .story-body {
   flex: 1;
@@ -289,9 +286,6 @@ a:focus-visible {
   font-family: var(--display);
   font-size: clamp(34px, 8.6vw, 44px);
   line-height: 1.14;
-}
-.story-hook em {
-  font-style: italic;
 }
 .story-foot {
   display: flex;
@@ -379,7 +373,6 @@ mark.hl {
 }
 .num {
   font-family: var(--display);
-  font-style: italic;
   font-size: 34px;
   line-height: 1;
   color: var(--dc);
@@ -478,7 +471,6 @@ mark.hl {
   flex: none;
   min-width: 1em;
   font-family: var(--display);
-  font-style: italic;
   font-size: 56px;
   line-height: 1;
   color: var(--accent);

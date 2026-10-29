@@ -12,6 +12,7 @@ import { useActiveKeys } from '../lib/keys'
 import { useProgress } from '../lib/progress'
 import { scopeConcepts, scopeLabel, type Scope } from '../lib/scope'
 import { dueCount } from '../lib/stats'
+import { btnPrimary, btnSecondary } from '../components/buttons'
 
 interface Slot {
   uid: string
@@ -24,7 +25,7 @@ function FeedCard({ item, kb, active, onDone }: { item: FeedItem; kb: Kb; active
   switch (item.kind) {
     case 'story': {
       const c = kb.conceptById.get(item.id)
-      return c ? <StoryCard concept={c} active={active} onDone={onDone} /> : null
+      return c ? <StoryCard concept={c} kb={kb} active={active} onDone={onDone} /> : null
     }
     case 'flashcard': {
       const fc = kb.flashcardById.get(item.id)
@@ -36,12 +37,12 @@ function FeedCard({ item, kb, active, onDone }: { item: FeedItem; kb: Kb; active
     }
     case 'table': {
       const t = kb.tableById.get(item.id)
-      return t ? <TableCard table={t} active={active} /> : null
+      return t ? <TableCard table={t} kb={kb} active={active} /> : null
     }
     case 'mnemonic':
     case 'trap': {
       const c = kb.conceptById.get(item.id)
-      return c ? <RecallCard concept={c} kind={item.kind} active={active} /> : null
+      return c ? <RecallCard concept={c} kb={kb} kind={item.kind} active={active} /> : null
     }
   }
 }
@@ -69,7 +70,7 @@ function EndCard({ kb, scope, onPick, onRestart }: { kb: Kb; scope: Scope; onPic
   return (
     <div className="mx-auto flex h-full w-full max-w-7xl px-3 pb-3 pt-1 md:px-8 md:pb-6">
       <div className="card d-0 flex w-full flex-col items-center justify-center gap-5 px-6 text-center">
-        <h2 className="font-display text-3xl font-bold md:text-5xl">{title}</h2>
+        <h2 className="font-display text-3xl font-medium md:text-5xl">{title}</h2>
         {scope.kind !== 'due' && unread > 0 && (
           <p className="text-muted">
             {unread} concept{unread === 1 ? '' : 's'} not finished yet.
@@ -77,17 +78,17 @@ function EndCard({ kb, scope, onPick, onRestart }: { kb: Kb; scope: Scope; onPic
         )}
         <div className="flex flex-col items-center gap-3">
           {scope.kind !== 'due' && unread > 0 && (
-            <button type="button" onClick={onRestart} className="rounded-full border border-line bg-surface px-5 py-2.5 font-bold">
+            <button type="button" onClick={onRestart} className={btnSecondary}>
               Go through the unfinished ones
             </button>
           )}
           {next && (
-            <button type="button" onClick={() => onPick({ kind: 'objective', objective: next.id })} className="rounded-full bg-accent px-6 py-3 font-bold text-accent-fg">
+            <button type="button" onClick={() => onPick({ kind: 'objective', objective: next.id })} className={btnPrimary}>
               Next up: {next.id} {next.title.length > 48 ? `${next.title.slice(0, 46)}...` : next.title}
             </button>
           )}
           {scope.kind !== 'due' && due > 0 && (
-            <button type="button" onClick={() => onPick({ kind: 'due' })} className="rounded-full border border-line bg-surface px-5 py-2.5 font-bold">
+            <button type="button" onClick={() => onPick({ kind: 'due' })} className={btnSecondary}>
               Review {due} due flashcard{due === 1 ? '' : 's'}
             </button>
           )}
@@ -216,9 +217,9 @@ export function Feed({ kb, scope, visible, onPick, onHome }: { kb: Kb; scope: Sc
   if (!scope)
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
-        <h1 className="font-display text-3xl font-bold">Pick what to study</h1>
+        <h1 className="font-display text-3xl font-medium">Pick what to study</h1>
         <p className="max-w-sm text-muted">Choose a domain, an objective or a mix on Home. The feed follows your choice.</p>
-        <button type="button" onClick={onHome} className="rounded-full bg-accent px-6 py-3 font-bold text-accent-fg">
+        <button type="button" onClick={onHome} className={btnPrimary}>
           Go to Home
         </button>
       </div>

@@ -1,8 +1,10 @@
 import { useMemo, useRef, useState } from 'react'
 import type { Kb } from '../kb/types'
 import { Account } from '../components/Account'
+import { btnDanger, btnPrimary, btnSecondary } from '../components/buttons'
 import { Label } from '../components/Chips'
 import { AUTH_ENABLED } from '../lib/auth'
+import { DOMAIN_SHORT } from '../lib/domains'
 import { MAX_IMPORT_BYTES, serializeBackup } from '../lib/backup'
 import { addDays, startOfDay, toIsoDate } from '../lib/dates'
 import type { Theme } from '../lib/db'
@@ -11,9 +13,9 @@ import { accuracy, domainStats, dueCount, streak } from '../lib/stats'
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="flex flex-col rounded-2xl border border-line bg-surface p-4">
-      <span className="font-display text-2xl font-bold">{value}</span>
-      <span className="text-xs text-muted">{label}</span>
+    <div className="flex flex-col gap-1 rounded-2xl border border-line bg-surface p-4 md:p-5">
+      <span className="font-display text-3xl tabular-nums leading-none md:text-4xl">{value}</span>
+      <span className="text-[13px] text-muted">{label}</span>
     </div>
   )
 }
@@ -65,9 +67,9 @@ export function Me({ kb }: { kb: Kb }) {
 
   return (
     <div className="mx-auto flex h-full max-w-xl flex-col md:max-w-4xl md:px-8 xl:max-w-6xl gap-6 overflow-y-auto px-4 py-6">
-      <h1 className="text-3xl font-extrabold">Me</h1>
+      <h1 className="text-3xl leading-tight md:text-4xl">Me</h1>
 
-      <section aria-label="Stats" className="grid grid-cols-2 gap-3">
+      <section aria-label="Stats" className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Day streak" value={streak(state, now)} />
         <Stat label="Cards due today" value={dueCount(state.cards, kb, endOfToday)} />
         <Stat label="Reviews today" value={reviewsToday} />
@@ -76,17 +78,23 @@ export function Me({ kb }: { kb: Kb }) {
 
       <section aria-label="Accuracy per domain" className="flex flex-col gap-2">
         <Label>Quiz accuracy per domain</Label>
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-3">
           {kb.outline.domains.map((d) => {
             const s = stats.get(d.number)
             const acc = accuracy(s)
             return (
-              <li key={d.id} className="grid grid-cols-[2.5rem_1fr_3.5rem] items-center gap-2 text-sm">
-                <span className="font-mono text-xs text-muted">D{d.number}</span>
-                <div className="h-2.5 overflow-hidden rounded-full bg-surface-2" title={d.title}>
-                  <div className={`bar-domain d-${d.number} h-full rounded-full`} style={{ width: `${Math.round((acc ?? 0) * 100)}%` }} />
+              <li key={d.id} className={`d-${d.number} flex flex-col gap-1.5`}>
+                <div className="flex items-baseline justify-between gap-3 text-sm">
+                  <span className="min-w-0 truncate">
+                    <span className="font-bold tabular-nums text-dc-ink">{d.number}</span> {DOMAIN_SHORT[d.number] ?? d.title}
+                  </span>
+                  <span className="shrink-0 text-[13px] tabular-nums text-muted">
+                    {acc === null ? 'No quizzes yet' : `${Math.round(acc * 100)}% of ${s?.attempts}`}
+                  </span>
                 </div>
-                <span className="text-right text-xs">{acc === null ? 'n/a' : `${Math.round(acc * 100)}% (${s?.attempts})`}</span>
+                <div className="h-2 overflow-hidden rounded-full bg-surface-2">
+                  <div className="bar-domain h-full rounded-full" style={{ width: `${Math.round((acc ?? 0) * 100)}%` }} />
+                </div>
               </li>
             )
           })}
@@ -136,15 +144,18 @@ export function Me({ kb }: { kb: Kb }) {
 
       <section aria-label="Data" className="flex flex-col gap-3">
         <Label>Your data</Label>
-        <p className="text-sm text-muted">Progress stays on this device. Export it to move to another browser or keep a backup.</p>
+        <p className="text-sm text-muted">
+          {AUTH_ENABLED ? 'Your progress is saved in this browser, not in your account. ' : 'Your progress is saved in this browser. '}
+          To continue on another device, export it here and import it there.
+        </p>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={onExport} className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-accent-fg">
+          <button type="button" onClick={onExport} className={btnPrimary}>
             Export progress
           </button>
-          <button type="button" onClick={() => fileRef.current?.click()} className="rounded-full border border-line px-4 py-2 text-sm font-semibold">
+          <button type="button" onClick={() => fileRef.current?.click()} className={btnSecondary}>
             Import progress
           </button>
-          <button type="button" onClick={() => void onReset()} className="rounded-full border border-danger px-4 py-2 text-sm font-semibold text-danger">
+          <button type="button" onClick={() => void onReset()} className={btnDanger}>
             Reset progress
           </button>
         </div>
@@ -168,7 +179,12 @@ export function Me({ kb }: { kb: Kb }) {
 
       <footer className="mt-auto flex flex-col gap-1 pb-2 text-xs text-muted">
         <p>Content version {kb.version} · ISC2 outline {kb.outline.outlineVersion}</p>
-        <p>Open source. No ads, no tracking. CISSP® is a registered certification mark of ISC2, Inc.; 8Domains is not affiliated with or endorsed by ISC2.</p>
+        <p>
+          <a href="https://github.com/fennih/8domains" className="underline underline-offset-2 hover:text-fg">
+            Open source
+          </a>
+          . No ads, no tracking. CISSP® is a registered certification mark of ISC2, Inc.; 8Domains is not affiliated with or endorsed by ISC2.
+        </p>
       </footer>
     </div>
   )

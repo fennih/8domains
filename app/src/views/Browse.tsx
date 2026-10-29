@@ -35,7 +35,7 @@ function TableView({ table }: { table: KbTable }) {
         <DomainChip domain={table.domain ?? 0} />
         <PriorityBadge priority={table.priority} />
       </div>
-      <h2 className="text-xl font-bold">{table.title}</h2>
+      <h2 className="text-xl font-medium">{table.title}</h2>
       {table.description && (
         <p className="text-sm text-muted">
           <Inline text={table.description} />
@@ -138,13 +138,13 @@ export function Browse({ kb }: { kb: Kb }) {
     body = d && (
       <section aria-label={d.title} className="flex flex-col gap-2">
         <DomainChip domain={d.number} />
-        <h2 className="text-xl font-bold">{d.title}</h2>
+        <h2 className="text-xl font-medium">{d.title}</h2>
         <ul className="flex flex-col gap-2">
           {d.objectives.map((o) => {
             const n = countFor((c) => c.objective === o.id)
             return (
               <Row key={o.id} onClick={() => setView({ level: 'objective', domain: d.number, objective: o.id })}>
-                <span className="w-8 shrink-0 font-mono text-xs text-muted">{o.id}</span>
+                <span className="w-8 shrink-0 text-xs font-bold tabular-nums text-muted">{o.id}</span>
                 <span className="flex flex-col">
                   <span className="text-sm font-medium">{o.title}</span>
                   <span className="text-xs text-muted">{n === 0 ? 'no concepts yet' : `${n} concept${n === 1 ? '' : 's'}`}</span>
@@ -161,8 +161,8 @@ export function Browse({ kb }: { kb: Kb }) {
     const concepts = kb.concepts.filter((c) => c.objective === view.objective)
     body = o && (
       <section aria-label={o.title} className="flex flex-col gap-2">
-        <span className="font-mono text-xs text-muted">{o.id}</span>
-        <h2 className="text-lg font-bold">{o.title}</h2>
+        <span className="text-xs font-bold tabular-nums text-muted">{o.id}</span>
+        <h2 className="text-lg font-medium">{o.title}</h2>
         {o.topics.length > 0 && (
           <ul className="mb-2 list-disc pl-5 text-xs text-muted">
             {o.topics.map((t) => (
@@ -215,8 +215,8 @@ export function Browse({ kb }: { kb: Kb }) {
         />
       </div>
       {view.level !== 'home' && query.trim().length < 2 && (
-        <button type="button" onClick={back} className="self-start rounded-full border border-line px-3 py-1 text-sm">
-          &lsaquo; Back
+        <button type="button" onClick={back} className="min-h-11 self-start text-sm font-semibold text-muted hover:text-fg">
+          &larr; Back
         </button>
       )}
       {body}
