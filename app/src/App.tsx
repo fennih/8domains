@@ -8,6 +8,7 @@ import { parseIsoDate } from './lib/dates'
 import { buildPlan } from './lib/plan'
 import { ProgressProvider, useProgress } from './lib/progress'
 import { scopeKey, type Scope } from './lib/scope'
+import { SyncProvider } from './lib/sync'
 import { dueCount } from './lib/stats'
 import { applyAnimations, applyTheme } from './lib/theme'
 import { Browse } from './views/Browse'
@@ -109,7 +110,9 @@ export function App() {
   if (!kb) return <Splash text="Loading..." />
   return (
     <ProgressProvider fallback={<Splash text="Opening your progress..." />}>
-      <Shell kb={kb} />
+      <SyncProvider>
+        <Shell kb={kb} />
+      </SyncProvider>
     </ProgressProvider>
   )
 }

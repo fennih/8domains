@@ -13,10 +13,10 @@ const date = z
   .max(40)
   .pipe(z.coerce.date())
   .refine((d) => !Number.isNaN(d.getTime()), 'invalid date')
-const isoDay = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+export const isoDay = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
 const num = z.number().finite()
 
-const card = z.strictObject({
+export const card = z.strictObject({
   id,
   due: date,
   stability: num,
@@ -30,13 +30,13 @@ const card = z.strictObject({
   last_review: date.optional(),
 })
 
-const reviewRow = z.strictObject({
+export const reviewRow = z.strictObject({
   cardId: id,
   rating: z.number().int().min(1).max(4),
   at: date,
 })
 
-const attempt = z.strictObject({
+export const attempt = z.strictObject({
   questionId: id,
   domain: z.number().int().min(1).max(8),
   chosen: z.number().int().min(0).max(3),
@@ -44,7 +44,7 @@ const attempt = z.strictObject({
   at: date,
 })
 
-const seen = z.strictObject({ conceptId: id, at: date })
+export const seen = z.strictObject({ conceptId: id, at: date })
 
 const settingsV1 = z.strictObject({
   firstLaunch: isoDay,

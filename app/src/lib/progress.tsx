@@ -2,8 +2,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { Card, Grade } from 'ts-fsrs'
 import type { Question } from '../kb/types'
 import type { BackupData } from './backup'
+import { AUTH_ENABLED } from './auth'
 import { addDays, toIsoDate } from './dates'
 import { db, type AttemptRow, type CardRow, type ReviewRow, type Settings } from './db'
+import { attemptChange, cardChange, emptySyncMeta, enqueue, notifyOutbox, reviewChange, seenChange, settingsChange, touchesSyncedSettings } from './outbox'
 import { review } from './srs'
 import type { ProgressSnapshot } from './stats'
 
@@ -21,6 +23,8 @@ interface ProgressApi {
   exportData: () => BackupData
   importData: (data: BackupData) => Promise<void>
   reset: () => Promise<void>
+  // Re-reads everything from IndexedDB after a sync changed it.
+  refresh: () => Promise<void>
 }
 
 const ProgressContext = createContext<ProgressApi | null>(null)
@@ -82,38 +86,60 @@ export function ProgressProvider({ children, fallback }: { children: ReactNode; 
     const prev = (await db.cards.get(cardId)) ?? undefined
     const next: CardRow = { ...review(prev, g, now), id: cardId }
     const row: ReviewRow = { cardId, rating: g, at: now }
-    await db.transaction('rw', db.cards, db.reviews, async () => {
+    await db.transaction('rw', db.cards, db.reviews, db.outbox, async () => {
       await db.cards.put(next)
       row.id = await db.reviews.add(row)
+      await enqueue([cardChange(next), reviewChange(row)])
     })
     setState((s) => s && { ...s, cards: new Map(s.cards).set(cardId, next), reviews: [...s.reviews, row] })
+    notifyOutbox()
     return next
   }, [])
 
   const recordAttempt = useCallback(async (q: Question, chosen: number) => {
     const row: AttemptRow = { questionId: q.id, domain: q.domain, chosen, correct: chosen === q.answer, at: new Date() }
-    row.id = await db.attempts.add(row)
+    await db.transaction('rw', db.attempts, db.outbox, async () => {
+      row.id = await db.attempts.add(row)
+      await enqueue([attemptChange(row)])
+    })
     setState((s) => s && { ...s, attempts: [...s.attempts, row] })
+    notifyOutbox()
   }, [])
 
   const markSeen = useCallback((conceptId: string) => {
     if (!stateRef.current || stateRef.current.seen.has(conceptId)) return
     const at = new Date()
-    void db.seen.put({ conceptId, at })
+    void db.transaction('rw', db.seen, db.outbox, async () => {
+      await db.seen.put({ conceptId, at })
+      await enqueue([seenChange('seen', { conceptId, at })])
+    }).then(notifyOutbox)
     setState((s) => (s && !s.seen.has(conceptId) ? { ...s, seen: new Map(s.seen).set(conceptId, at) } : s))
   }, [])
 
   const markRead = useCallback((conceptId: string) => {
     if (!stateRef.current || stateRef.current.read.has(conceptId)) return
     const at = new Date()
-    void db.read.put({ conceptId, at })
+    void db.transaction('rw', db.read, db.outbox, async () => {
+      await db.read.put({ conceptId, at })
+      await enqueue([seenChange('read', { conceptId, at })])
+    }).then(notifyOutbox)
     setState((s) => (s && !s.read.has(conceptId) ? { ...s, read: new Map(s.read).set(conceptId, at) } : s))
   }, [])
 
   const updateSettings = useCallback(async (patch: Partial<Settings>) => {
-    const value = { ...normalizeSettings((await db.settings.get('settings'))?.value), ...patch }
-    await db.settings.put({ key: 'settings', value })
+    const synced = AUTH_ENABLED && touchesSyncedSettings(patch)
+    const value = await db.transaction('rw', db.settings, db.meta, db.outbox, async () => {
+      const value = { ...normalizeSettings((await db.settings.get('settings'))?.value), ...patch }
+      await db.settings.put({ key: 'settings', value })
+      if (synced) {
+        const at = Date.now()
+        await db.meta.put({ ...((await db.meta.get('sync')) ?? emptySyncMeta()), settingsAt: at })
+        await enqueue([settingsChange(value, at)])
+      }
+      return value
+    })
     setState((s) => s && { ...s, settings: value })
+    if (synced) notifyOutbox()
   }, [])
 
   const exportData = useCallback((): BackupData => {
@@ -130,8 +156,8 @@ export function ProgressProvider({ children, fallback }: { children: ReactNode; 
   }, [state])
 
   const replaceAll = useCallback(async (data: BackupData) => {
-    await db.transaction('rw', [db.cards, db.reviews, db.attempts, db.seen, db.read, db.settings], async () => {
-      await Promise.all([db.cards.clear(), db.reviews.clear(), db.attempts.clear(), db.seen.clear(), db.read.clear(), db.settings.clear()])
+    await db.transaction('rw', [db.cards, db.reviews, db.attempts, db.seen, db.read, db.settings, db.outbox], async () => {
+      await Promise.all([db.cards.clear(), db.reviews.clear(), db.attempts.clear(), db.seen.clear(), db.read.clear(), db.settings.clear(), db.outbox.clear()])
       await db.cards.bulkAdd(data.cards)
       await db.reviews.bulkAdd(data.reviews)
       await db.attempts.bulkAdd(data.attempts)
@@ -147,6 +173,8 @@ export function ProgressProvider({ children, fallback }: { children: ReactNode; 
     [replaceAll],
   )
 
+  const refresh = useCallback(async () => setState(await loadState()), [])
+
   const api = useMemo<ProgressApi | null>(
     () =>
       state && {
@@ -159,8 +187,9 @@ export function ProgressProvider({ children, fallback }: { children: ReactNode; 
         exportData,
         importData: replaceAll,
         reset,
+        refresh,
       },
-    [state, grade, recordAttempt, markSeen, markRead, updateSettings, exportData, replaceAll, reset],
+    [state, grade, recordAttempt, markSeen, markRead, updateSettings, exportData, replaceAll, reset, refresh],
   )
 
   if (error) return <p className="p-6 text-danger">Could not open local storage: {error}</p>

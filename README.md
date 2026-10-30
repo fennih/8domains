@@ -11,9 +11,9 @@ A scrollable study feed for the CISSP® exam: short stories, spaced-repetition f
 
 ## Stack
 
-React 19 · Vite · Tailwind 4 · [FSRS](https://github.com/open-spaced-repetition/ts-fsrs) · IndexedDB · Cloudflare Workers · Clerk
+React 19 · Vite · Tailwind 4 · [FSRS](https://github.com/open-spaced-repetition/ts-fsrs) · IndexedDB · Cloudflare Workers · D1 · Clerk
 
-Progress never leaves the browser. The Worker serves the landing and gates `/app/` behind a session.
+Progress lives in IndexedDB, works offline and syncs per account through D1. The Worker serves the landing, gates `/app/` behind a session and exposes the sync API.
 
 ## Run
 
@@ -34,7 +34,7 @@ The study content is not published here. It is still under editorial review: eve
 ```
 app/              React PWA
 landing/          static landing, privacy page, security.txt
-worker/           Cloudflare Worker: assets, session gate, security headers
+worker/           Cloudflare Worker: assets, session gate, security headers, sync API, D1 migrations
 pipeline/         compiles content into the app's JSON
 example-content/  placeholder content in the real format
 ```

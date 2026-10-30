@@ -1,4 +1,7 @@
 import { createClerkClient } from '@clerk/backend'
+import { respond, withSecurityHeaders } from './http'
+import { handleSync } from './sync'
+import { handleClerkWebhook } from './webhook'
 
 interface Env {
   ASSETS: Fetcher
@@ -7,16 +10,11 @@ interface Env {
   CLERK_PUBLISHABLE_KEY: string
   CLERK_SECRET_KEY?: string
   CLERK_JWT_KEY?: string
+  CLERK_WEBHOOK_SIGNING_SECRET?: string
+  // Progress sync; without the binding the app keeps progress in the browser only.
+  DB?: D1Database
   // Only for forks that run without accounts; must be set explicitly.
   AUTH_DISABLED?: string
-}
-
-const SECURITY_HEADERS: Record<string, string> = {
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-  'X-Content-Type-Options': 'nosniff',
-  'Referrer-Policy': 'no-referrer',
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
-  'Cross-Origin-Opener-Policy': 'same-origin',
 }
 
 // The publishable key is pk_(test|live)_<base64 of "<frontend api host>$">.
@@ -51,16 +49,9 @@ function isNavigation(request: Request): boolean {
   return request.headers.get('Accept')?.includes('text/html') ?? false
 }
 
-function respond(body: BodyInit | null, status: number, headers: HeadersInit = {}): Response {
-  const res = new Response(body, { status, headers })
-  for (const [k, v] of Object.entries(SECURITY_HEADERS)) res.headers.set(k, v)
-  return res
-}
-
 async function serveApp(request: Request, env: Env, csp: string, authHeaders?: Headers): Promise<Response> {
   const asset = await env.ASSETS.fetch(request)
-  const res = new Response(asset.body, asset)
-  for (const [k, v] of Object.entries(SECURITY_HEADERS)) res.headers.set(k, v)
+  const res = withSecurityHeaders(new Response(asset.body, asset))
   res.headers.set('Content-Security-Policy', csp)
   // Gated content must never land in a shared cache.
   res.headers.set('Cache-Control', 'private, max-age=0, must-revalidate')
@@ -77,9 +68,15 @@ export default {
       const asset = await env.ASSETS.fetch(new Request(new URL('/security.txt', request.url), request))
       return respond(asset.body, asset.status, { 'Content-Type': 'text/plain; charset=utf-8' })
     }
+    if (pathname === '/api/clerk/webhook') return handleClerkWebhook(request, env.DB, env.CLERK_WEBHOOK_SIGNING_SECRET)
     if (pathname !== '/app' && !pathname.startsWith('/app/')) return respond('Not found', 404)
 
-    if (env.AUTH_DISABLED === 'true') return serveApp(request, env, appCsp(null))
+    const isApi = pathname.startsWith('/app/api/')
+    if (env.AUTH_DISABLED === 'true') return isApi ? respond('Not found', 404) : serveApp(request, env, appCsp(null))
+    // The API accepts only a bearer token, never the session cookie, so a cross-site request cannot use it.
+    if (isApi && !request.headers.get('Authorization')?.startsWith('Bearer ')) {
+      return respond('Unauthorized', 401, { 'Cache-Control': 'no-store' })
+    }
     if (!env.CLERK_SECRET_KEY || !env.CLERK_PUBLISHABLE_KEY) return respond('Sign-in is not configured.', 503)
 
     const fapi = frontendApi(env.CLERK_PUBLISHABLE_KEY)
@@ -93,6 +90,12 @@ export default {
       jwtKey: env.CLERK_JWT_KEY,
       signInUrl: env.SIGN_IN_URL,
     })
+
+    if (isApi) {
+      if (!state.isAuthenticated) return respond('Unauthorized', 401, { 'Cache-Control': 'no-store' })
+      if (pathname !== '/app/api/sync' || !env.DB) return respond('Not found', 404)
+      return handleSync(request, env.DB, state.toAuth().userId)
+    }
 
     // Clerk refreshes an expired session by bouncing the browser through its Frontend API.
     if (state.status === 'handshake') return respond(null, 307, state.headers)

@@ -30,4 +30,4 @@ build: kb  ## landing at /, app at /app/, assembled in dist/ for the Worker
 	   $(FONTS)/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-wght-normal.woff2 dist/fonts/
 
 preview: build  ## run the Worker locally against dist/ (needs worker/.dev.vars)
-	cd worker && bun run dev
+	cd worker && bun run migrate && bun run dev

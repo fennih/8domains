@@ -9,6 +9,7 @@ import { MAX_IMPORT_BYTES, serializeBackup } from '../lib/backup'
 import { addDays, startOfDay, toIsoDate } from '../lib/dates'
 import type { Theme } from '../lib/db'
 import { useProgress } from '../lib/progress'
+import { useSync, type SyncStatus } from '../lib/sync'
 import { accuracy, domainStats, dueCount, streak } from '../lib/stats'
 
 function Stat({ label, value }: { label: string; value: string | number }) {
@@ -20,10 +21,19 @@ function Stat({ label, value }: { label: string; value: string | number }) {
   )
 }
 
+function syncLine(status: SyncStatus, lastSyncAt: Date | null): string {
+  if (status === 'syncing') return 'Syncing...'
+  if (status === 'offline') return 'Offline. Changes sync when you are back online.'
+  if (status === 'error') return 'Last sync failed. It will retry shortly.'
+  if (!lastSyncAt) return 'Not synced yet.'
+  return `Last synced ${lastSyncAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}.`
+}
+
 const fieldClass = 'rounded-xl border border-line bg-surface-2 px-3 py-2 text-fg'
 
 export function Me({ kb }: { kb: Kb }) {
   const { state, updateSettings, exportData, importData, reset } = useProgress()
+  const sync = useSync()
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const now = new Date()
@@ -49,8 +59,12 @@ export function Me({ kb }: { kb: Kb }) {
       if (file.size > MAX_IMPORT_BYTES) throw new Error('File is larger than 5 MB.')
       const { parseBackup } = await import('../lib/importBackup')
       const data = await parseBackup(file)
-      if (!window.confirm('Replace all current progress with the imported file?')) return
+      const question = sync
+        ? 'Replace the progress on this device with the imported file? It is then merged with the progress in your account.'
+        : 'Replace all current progress with the imported file?'
+      if (!window.confirm(question)) return
       await importData(data)
+      if (sync) await sync.resync()
       setMessage({ kind: 'ok', text: `Imported ${data.cards.length} cards, ${data.attempts.length} quiz attempts.` })
     } catch (e) {
       setMessage({ kind: 'error', text: e instanceof Error ? e.message : 'Import failed.' })
@@ -60,7 +74,17 @@ export function Me({ kb }: { kb: Kb }) {
   }
 
   const onReset = async () => {
-    if (!window.confirm('Delete all progress, reviews and settings on this device? This cannot be undone.')) return
+    const question = sync
+      ? 'Delete all progress, reviews and settings in your account and on every device? This cannot be undone.'
+      : 'Delete all progress, reviews and settings on this device? This cannot be undone.'
+    if (!window.confirm(question)) return
+    try {
+      // The account goes first: if it cannot be reached, local data stays so nothing is half-deleted.
+      await sync?.resetRemote()
+    } catch {
+      setMessage({ kind: 'error', text: 'Could not reach the server. Connect and try again.' })
+      return
+    }
     await reset()
     setMessage({ kind: 'ok', text: 'Progress reset.' })
   }
@@ -144,11 +168,19 @@ export function Me({ kb }: { kb: Kb }) {
 
       <section aria-label="Data" className="flex flex-col gap-3">
         <Label>Your data</Label>
-        <p className="text-sm text-muted">
-          {AUTH_ENABLED ? 'Your progress is saved in this browser, not in your account. ' : 'Your progress is saved in this browser. '}
-          To continue on another device, export it here and import it there.
-        </p>
+        {sync ? (
+          <p className="text-sm text-muted">
+            Your progress is saved in your account and syncs on every device you sign in to. It also works offline. {syncLine(sync.status, sync.lastSyncAt)}
+          </p>
+        ) : (
+          <p className="text-sm text-muted">Your progress is saved in this browser. To continue on another device, export it here and import it there.</p>
+        )}
         <div className="flex flex-wrap gap-2">
+          {sync && (
+            <button type="button" onClick={() => void sync.syncNow()} disabled={sync.status === 'syncing'} className={btnSecondary}>
+              Sync now
+            </button>
+          )}
           <button type="button" onClick={onExport} className={btnPrimary}>
             Export progress
           </button>
