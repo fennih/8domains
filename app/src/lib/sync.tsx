@@ -65,11 +65,15 @@ function AccountSync({ children }: { children: ReactNode }) {
   const syncRef = useRef(syncNow)
   syncRef.current = syncNow
 
+  // Clerk may still be loading on mount; the first sync waits for the user id.
+  useEffect(() => {
+    if (userId) void syncRef.current()
+  }, [userId])
+
   useEffect(() => {
     void engine()
       .then((e) => e.lastSyncAt())
       .then(setLastSyncAt)
-    void syncRef.current()
 
     let timer: ReturnType<typeof setTimeout> | undefined
     const soon = () => {
