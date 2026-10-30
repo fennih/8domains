@@ -340,6 +340,30 @@ strong {
   background: var(--c-text-2);
 }
 
+/* Numbered answers: Spectral numbers in the domain color, hanging so items align. */
+.ol-num {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  list-style: none;
+  counter-reset: num;
+  padding: 0;
+  margin: 0;
+}
+.ol-num > li {
+  position: relative;
+  counter-increment: num;
+  padding-left: 1.6em;
+}
+.ol-num > li::before {
+  content: counter(num);
+  position: absolute;
+  left: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--dc, var(--c-accent));
+}
+
 /* Highlighter: a marker stroke drawn as SVG. Fixed-width chisel ends plus a stretching middle keep the slant
    outside the first and last letters at any length; every wrapped line gets its own stroke (clone).
    The sweep grows the middle and slides the right end like a marker tip. */

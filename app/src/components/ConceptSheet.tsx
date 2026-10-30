@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Kb } from '../kb/types'
 import { ConceptBody } from './ConceptBody'
 import { DomainChip, Label, PriorityBadge } from './Chips'
+import { CardBack } from './CardBack'
 import { Inline } from './Inline'
 import { OpenConceptContext } from './openConcept'
 
@@ -63,9 +64,9 @@ export function ConceptSheetProvider({ kb, children }: { kb: Kb; children: React
                     <p className="font-medium">
                       <Inline text={fc.front} />
                     </p>
-                    <p className="mt-1 text-muted">
-                      <Inline text={fc.back} />
-                    </p>
+                    <div className="mt-1 text-muted">
+                      <CardBack back={fc.back} />
+                    </div>
                   </div>
                 ))}
               </div>

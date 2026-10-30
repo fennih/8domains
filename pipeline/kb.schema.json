@@ -126,7 +126,19 @@
           "$ref": "#/$defs/text"
         },
         "back": {
-          "$ref": "#/$defs/text"
+          "oneOf": [
+            {
+              "$ref": "#/$defs/text"
+            },
+            {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 10,
+              "items": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          ]
         }
       }
     },

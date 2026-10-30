@@ -32,7 +32,7 @@ export function buildSearch(kb: Kb): MiniSearch<SearchDoc> {
       kind: 'flashcard' as const,
       refId: f.conceptId,
       title: strip(f.front),
-      text: strip(f.back),
+      text: strip([f.back].flat().join(' ')),
       domain: kb.conceptById.get(f.conceptId)?.domain ?? 0,
     })),
     ...kb.tables.map((t) => ({

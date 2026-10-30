@@ -3,6 +3,7 @@ import type { Kb, Question } from '../../kb/types'
 import { useActiveKeys } from '../../lib/keys'
 import { useMediaQuery, WIDE } from '../../lib/media'
 import { useProgress } from '../../lib/progress'
+import { btnPrimary } from '../buttons'
 import { CardContext, Label } from '../Chips'
 import { Inline } from '../Inline'
 import { useOpenConcept } from '../openConcept'
@@ -10,7 +11,7 @@ import { CardShell } from './CardShell'
 
 const LETTERS = ['A', 'B', 'C', 'D']
 
-export function QuizCard({ question, kb, active }: { question: Question; kb: Kb; active: boolean }) {
+export function QuizCard({ question, kb, active, onDone }: { question: Question; kb: Kb; active: boolean; onDone: () => void }) {
   const { recordAttempt } = useProgress()
   const openConcept = useOpenConcept()
   const [chosen, setChosen] = useState<number | null>(null)
@@ -29,6 +30,9 @@ export function QuizCard({ question, kb, active }: { question: Question; kb: Kb;
     if (n >= 1 && n <= question.options.length) {
       e.preventDefault()
       choose(n - 1)
+    } else if (locked && e.key === 'Enter' && !(e.target as HTMLElement | null)?.closest('button')) {
+      e.preventDefault()
+      onDone()
     }
   })
 
@@ -47,13 +51,20 @@ export function QuizCard({ question, kb, active }: { question: Question; kb: Kb;
       <p className="text-sm leading-relaxed lg:text-base">
         <Inline text={question.explanation} />
       </p>
-      <div className="flex flex-wrap gap-2">
+      <div className="mt-1 flex flex-wrap items-center gap-2">
+        <span className="text-xs font-bold uppercase tracking-[0.08em] text-muted">Explained in</span>
         {question.conceptIds
           .map((id) => kb.conceptById.get(id))
           .filter((c) => c !== undefined)
           .map((c) => (
-            <button key={c.id} type="button" onClick={() => openConcept(c.id)} className="rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold hover:border-dc">
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => openConcept(c.id)}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-dc-edge bg-dc-soft px-3 text-sm font-semibold text-dc-ink hover:border-dc"
+            >
               {c.title}
+              <span aria-hidden="true">&rarr;</span>
             </button>
           ))}
       </div>
@@ -92,7 +103,15 @@ export function QuizCard({ question, kb, active }: { question: Question; kb: Kb;
         </div>
       </div>
       {locked && !isWide && feedback}
-      {!locked && <p className="mt-4 text-xs text-muted">Keys 1 to 4 pick an option.</p>}
+      {locked ? (
+        <div className="mt-5 flex justify-end">
+          <button type="button" onClick={onDone} className={btnPrimary}>
+            Next <span aria-hidden="true">&rarr;</span>
+          </button>
+        </div>
+      ) : (
+        <p className="mt-4 text-xs text-muted">Keys 1 to 4 pick an option.</p>
+      )}
     </CardShell>
   )
 }

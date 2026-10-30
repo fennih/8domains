@@ -89,6 +89,11 @@ def scalar_text(value):
     return str(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else value
 
 
+def card_back(value):
+    # A list answer is shown as a numbered list, one element per item.
+    return [scalar_text(v) for v in value] if isinstance(value, list) else scalar_text(value)
+
+
 def build_concept(path: Path, domain: int) -> tuple[dict, list[dict]]:
     fm, body = split_frontmatter(path)
     unknown = set(fm) - CONCEPT_FM
@@ -112,7 +117,7 @@ def build_concept(path: Path, domain: int) -> tuple[dict, list[dict]]:
             "conceptId": concept["id"],
             "type": card.get("type", "qa"),
             "front": scalar_text(card.get("q")),
-            "back": scalar_text(card.get("a")),
+            "back": card_back(card.get("a")),
         }
         for i, card in enumerate(fm.get("flashcards") or [], 1)
     ]

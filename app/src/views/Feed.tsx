@@ -29,11 +29,11 @@ function FeedCard({ item, kb, active, onDone }: { item: FeedItem; kb: Kb; active
     }
     case 'flashcard': {
       const fc = kb.flashcardById.get(item.id)
-      return fc ? <FlashcardCard card={fc} kb={kb} active={active} /> : null
+      return fc ? <FlashcardCard card={fc} kb={kb} active={active} onDone={onDone} /> : null
     }
     case 'quiz': {
       const q = kb.questionById.get(item.id)
-      return q ? <QuizCard question={q} kb={kb} active={active} /> : null
+      return q ? <QuizCard question={q} kb={kb} active={active} onDone={onDone} /> : null
     }
     case 'table': {
       const t = kb.tableById.get(item.id)

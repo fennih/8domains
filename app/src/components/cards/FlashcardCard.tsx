@@ -1,23 +1,37 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Rating, type Grade } from 'ts-fsrs'
 import type { Flashcard, Kb } from '../../kb/types'
 import { flashcardDomain } from '../../kb/types'
 import { formatInterval } from '../../lib/dates'
 import { useActiveKeys } from '../../lib/keys'
 import { useProgress } from '../../lib/progress'
+import { CardBack } from '../CardBack'
 import { CardContext, Label } from '../Chips'
 import { Inline } from '../Inline'
 import { useOpenConcept } from '../openConcept'
 import { CardShell } from './CardShell'
 
-const TYPE_LABEL = { qa: 'Flashcard', cloze: 'Fill the gap', compare: 'Compare' } as const
+const TYPE_LABEL = { qa: '', cloze: ' · Fill the gap', compare: ' · Compare' } as const
+// Long enough to read "Back in 2d" before the feed moves on.
+const ADVANCE_MS = 700
 
-export function FlashcardCard({ card, kb, active }: { card: Flashcard; kb: Kb; active: boolean }) {
-  const { grade } = useProgress()
+export function FlashcardCard({ card, kb, active, onDone }: { card: Flashcard; kb: Kb; active: boolean; onDone: () => void }) {
+  const { state, grade } = useProgress()
   const openConcept = useOpenConcept()
   const [flipped, setFlipped] = useState(false)
   const [result, setResult] = useState<Date | null>(null)
   const [busy, setBusy] = useState(false)
+  // Fixed at mount so grading does not flip the label from "New card" to "Review".
+  const [isNew] = useState(() => !state.cards.has(card.id))
+  const activeRef = useRef(active)
+  activeRef.current = active
+  const advance = useRef<number | undefined>(undefined)
+  useEffect(() => () => window.clearTimeout(advance.current), [])
+
+  const next = () => {
+    window.clearTimeout(advance.current)
+    onDone()
+  }
   const concept = kb.conceptById.get(card.conceptId)
   const domain = flashcardDomain(card)
 
@@ -26,6 +40,9 @@ export function FlashcardCard({ card, kb, active }: { card: Flashcard; kb: Kb; a
     setBusy(true)
     try {
       setResult((await grade(card.id, g)).due)
+      advance.current = window.setTimeout(() => {
+        if (activeRef.current) onDone()
+      }, ADVANCE_MS)
     } finally {
       setBusy(false)
     }
@@ -44,6 +61,7 @@ export function FlashcardCard({ card, kb, active }: { card: Flashcard; kb: Kb; a
       if (target?.closest('button') && !target.closest('[aria-expanded]')) return
       e.preventDefault()
       if (!flipped) setFlipped(true)
+      else if (result) next()
       else void onGrade(Rating.Good)
     }
   })
@@ -53,7 +71,7 @@ export function FlashcardCard({ card, kb, active }: { card: Flashcard; kb: Kb; a
       <div className="flex items-start justify-between gap-4">
         <CardContext kb={kb} domain={domain} objective={concept?.objective} />
         <span className="flex min-w-0 flex-col items-end gap-0.5">
-          <Label>{TYPE_LABEL[card.type]}</Label>
+          <Label>{`${isNew ? 'New card' : 'Review'}${TYPE_LABEL[card.type]}`}</Label>
           {concept && (
             <button type="button" onClick={() => openConcept(concept.id)} className="max-w-full truncate text-right text-[13px] text-muted hover:text-fg md:text-sm">
               {concept.title}
@@ -61,23 +79,25 @@ export function FlashcardCard({ card, kb, active }: { card: Flashcard; kb: Kb; a
           )}
         </span>
       </div>
-      <button
-        type="button"
-        onClick={() => setFlipped((f) => !f)}
-        aria-expanded={flipped}
-        className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-6 rounded-2xl text-left"
-      >
-        <span className="font-display text-[1.75rem] font-medium leading-tight md:text-5xl">
-          <Inline text={card.front} />
-        </span>
-        {flipped ? (
-          <span className="reveal border-t-2 border-dashed border-line pt-6 text-xl leading-relaxed md:text-3xl">
-            <Inline text={card.back} />
+      {/* The answer sits outside the flip button: a numbered list is not valid button content. */}
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-6">
+        <button
+          type="button"
+          onClick={() => setFlipped((f) => !f)}
+          aria-expanded={flipped}
+          className={`flex flex-col justify-center gap-6 rounded-2xl text-left ${flipped ? '' : 'flex-1'}`}
+        >
+          <span className="font-display text-[1.75rem] font-medium leading-tight md:text-5xl">
+            <Inline text={card.front} />
           </span>
-        ) : (
-          <span className="text-sm text-muted">Tap to flip</span>
+          {!flipped && <span className="text-sm text-muted">Tap to flip</span>}
+        </button>
+        {flipped && (
+          <div className="reveal border-t-2 border-dashed border-line pt-6 text-xl leading-relaxed md:text-3xl">
+            <CardBack back={card.back} />
+          </div>
         )}
-      </button>
+      </div>
       {flipped && (
         <div className="mx-auto w-full max-w-3xl">
           {result ? (

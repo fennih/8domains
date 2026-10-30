@@ -27,7 +27,7 @@ export interface Flashcard {
   conceptId: string
   type: 'qa' | 'cloze' | 'compare'
   front: string
-  back: string
+  back: string | string[] // a list is shown numbered
 }
 
 export interface Question {
