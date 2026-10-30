@@ -105,7 +105,7 @@ export function QuizCard({ question, kb, active, onDone }: { question: Question;
       {locked && !isWide && feedback}
       {locked ? (
         <div className="mt-5 flex justify-end">
-          <button type="button" onClick={onDone} className={btnPrimary}>
+          <button type="button" onClick={onDone} className={`${btnPrimary} gap-2`}>
             Next <span aria-hidden="true">&rarr;</span>
           </button>
         </div>
