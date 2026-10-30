@@ -1,6 +1,8 @@
 import { createEmptyCard, fsrs, generatorParameters, Rating, State, type Card, type Grade, type IPreview } from 'ts-fsrs'
 
-const scheduler = fsrs(generatorParameters({ enable_fuzz: true, request_retention: 0.9 }))
+// One 10m learning step: "Again" comes back within the session, "Good" on a new card graduates (about 2 days)
+// instead of returning 10 minutes later. Cards are graded right after their story, so that is the first exposure.
+const scheduler = fsrs(generatorParameters({ enable_fuzz: true, request_retention: 0.9, learning_steps: ['10m'] }))
 
 export const GRADES: { grade: Grade; label: string; key: string }[] = [
   { grade: Rating.Again, label: 'Again', key: '1' },
