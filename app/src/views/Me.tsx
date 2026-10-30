@@ -176,11 +176,6 @@ export function Me({ kb }: { kb: Kb }) {
           <p className="text-sm text-muted">Your progress is saved in this browser. To continue on another device, export it here and import it there.</p>
         )}
         <div className="flex flex-wrap gap-2">
-          {sync && (
-            <button type="button" onClick={() => void sync.syncNow()} disabled={sync.status === 'syncing'} className={btnSecondary}>
-              Sync now
-            </button>
-          )}
           <button type="button" onClick={onExport} className={btnPrimary}>
             Export progress
           </button>

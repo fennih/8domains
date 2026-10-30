@@ -9,7 +9,6 @@ export type SyncStatus = 'idle' | 'syncing' | 'offline' | 'error'
 interface SyncApi {
   status: SyncStatus
   lastSyncAt: Date | null
-  syncNow: () => Promise<void>
   // Merges freshly imported local data with the account.
   resync: () => Promise<void>
   // Deletes the account's progress everywhere; throws when the server cannot be reached.
@@ -111,7 +110,7 @@ function AccountSync({ children }: { children: ReactNode }) {
     await (await engine()).resetRemote(() => getToken())
   }, [getToken])
 
-  const api = useMemo(() => ({ status, lastSyncAt, syncNow, resync, resetRemote }), [status, lastSyncAt, syncNow, resync, resetRemote])
+  const api = useMemo(() => ({ status, lastSyncAt, resync, resetRemote }), [status, lastSyncAt, resync, resetRemote])
   return <SyncContext.Provider value={api}>{children}</SyncContext.Provider>
 }
 
