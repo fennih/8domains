@@ -160,17 +160,17 @@ export function buildBatch(input: FeedInput): Batch {
   const pending: { fc: Flashcard; readyAt: number }[] = []
   const pendingIds = new Set<string>()
 
-  // (c) Quiz from the scope: weak domains, wrong or unattempted questions weigh more.
+  // (c) Quiz from the scope, only on concepts already read or shown earlier in the batch:
+  // weak domains, wrong or unattempted questions weigh more.
   const lastAttempt = new Map<string, boolean>()
   for (const a of progress.attempts) lastAttempt.set(a.questionId, a.correct)
   const pickQuiz = (): FeedItem | undefined => {
     const q = pickWeighted(
-      kb.questions.filter((q) => questionInScope(scope, q) && free(itemKey('quiz', q.id))),
+      kb.questions.filter((q) => questionInScope(scope, q) && q.conceptIds.every(known) && free(itemKey('quiz', q.id))),
       (q) => {
         const last = lastAttempt.get(q.id)
         const status = last === undefined ? 1.5 : last ? 0.4 : 2
-        const related = q.conceptIds.some(known) ? 1.5 : 1
-        return domainWeight(q.domain) * status * related * shownFactor(itemKey('quiz', q.id))
+        return domainWeight(q.domain) * status * shownFactor(itemKey('quiz', q.id))
       },
       rng,
     )
