@@ -67,7 +67,6 @@ export interface SyncMeta {
   cursor: number
   // When the synced settings fields last changed on this device (0: never set explicitly).
   settingsAt: number
-  lastSyncAt: string | null
 }
 
 // Database, theme key and backup tag keep the pre-rename id so existing progress and backups stay valid.

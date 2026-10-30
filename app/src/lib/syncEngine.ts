@@ -209,7 +209,6 @@ export async function runSync(userId: string, getToken: GetToken): Promise<boole
     if ((await db.outbox.count()) === 0) break
   }
 
-  await db.meta.update('sync', { lastSyncAt: new Date().toISOString() })
   return changed
 }
 
@@ -227,9 +226,4 @@ export async function resync(): Promise<void> {
 export async function resetRemote(getToken: GetToken): Promise<void> {
   const { seq } = resetResponse.parse(await call(getToken, 'DELETE'))
   await db.meta.put({ ...(await readMeta()), cursor: seq, settingsAt: 0 })
-}
-
-export async function lastSyncAt(): Promise<Date | null> {
-  const at = (await db.meta.get('sync'))?.lastSyncAt
-  return at ? new Date(at) : null
 }

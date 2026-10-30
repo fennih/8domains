@@ -57,4 +57,4 @@ export function notifyOutbox() {
   if (AUTH_ENABLED) outboxEvents.dispatchEvent(new Event('change'))
 }
 
-export const emptySyncMeta = (): SyncMeta => ({ key: 'sync', userId: null, cursor: 0, settingsAt: 0, lastSyncAt: null })
+export const emptySyncMeta = (): SyncMeta => ({ key: 'sync', userId: null, cursor: 0, settingsAt: 0 })

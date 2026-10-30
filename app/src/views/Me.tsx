@@ -21,12 +21,11 @@ function Stat({ label, value }: { label: string; value: string | number }) {
   )
 }
 
-function syncLine(status: SyncStatus, lastSyncAt: Date | null): string {
-  if (status === 'syncing') return 'Syncing...'
+// Sync runs on its own; it is only worth mentioning when it cannot.
+function syncProblem(status: SyncStatus): string | null {
   if (status === 'offline') return 'Offline. Changes sync when you are back online.'
   if (status === 'error') return 'Last sync failed. It will retry shortly.'
-  if (!lastSyncAt) return 'Not synced yet.'
-  return `Last synced ${lastSyncAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}.`
+  return null
 }
 
 const fieldClass = 'rounded-xl border border-line bg-surface-2 px-3 py-2 text-fg'
@@ -170,7 +169,7 @@ export function Me({ kb }: { kb: Kb }) {
         <Label>Your data</Label>
         {sync ? (
           <p className="text-sm text-muted">
-            Your progress is saved in your account and syncs on every device you sign in to. It also works offline. {syncLine(sync.status, sync.lastSyncAt)}
+            Your progress is saved in your account and syncs on every device you sign in to. It also works offline. {syncProblem(sync.status)}
           </p>
         ) : (
           <p className="text-sm text-muted">Your progress is saved in this browser. To continue on another device, export it here and import it there.</p>

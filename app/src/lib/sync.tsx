@@ -8,7 +8,6 @@ export type SyncStatus = 'idle' | 'syncing' | 'offline' | 'error'
 
 interface SyncApi {
   status: SyncStatus
-  lastSyncAt: Date | null
   // Merges freshly imported local data with the account.
   resync: () => Promise<void>
   // Deletes the account's progress everywhere; throws when the server cannot be reached.
@@ -27,7 +26,6 @@ function AccountSync({ children }: { children: ReactNode }) {
   const { userId, getToken } = useAuth()
   const { refresh } = useProgress()
   const [status, setStatus] = useState<SyncStatus>('idle')
-  const [lastSyncAt, setLastSyncAt] = useState<Date | null>(null)
   const running = useRef<Promise<void> | null>(null)
   const again = useRef(false)
 
@@ -51,7 +49,6 @@ function AccountSync({ children }: { children: ReactNode }) {
           if (await runSync(userId, () => getToken())) await refresh()
         } while (again.current)
         setStatus('idle')
-        setLastSyncAt(new Date())
       } catch {
         setStatus(navigator.onLine ? 'error' : 'offline')
       } finally {
@@ -70,10 +67,6 @@ function AccountSync({ children }: { children: ReactNode }) {
   }, [userId])
 
   useEffect(() => {
-    void engine()
-      .then((e) => e.lastSyncAt())
-      .then(setLastSyncAt)
-
     let timer: ReturnType<typeof setTimeout> | undefined
     const soon = () => {
       clearTimeout(timer)
@@ -110,7 +103,7 @@ function AccountSync({ children }: { children: ReactNode }) {
     await (await engine()).resetRemote(() => getToken())
   }, [getToken])
 
-  const api = useMemo(() => ({ status, lastSyncAt, resync, resetRemote }), [status, lastSyncAt, resync, resetRemote])
+  const api = useMemo(() => ({ status, resync, resetRemote }), [status, resync, resetRemote])
   return <SyncContext.Provider value={api}>{children}</SyncContext.Provider>
 }
 
