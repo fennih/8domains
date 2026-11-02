@@ -14,7 +14,7 @@ import { applyAnimations, applyTheme } from './lib/theme'
 import { Browse } from './views/Browse'
 import { Coverage } from './views/Coverage'
 import { Feed } from './views/Feed'
-import { Home } from './views/Home'
+import { Home, type HomeView } from './views/Home'
 import { Me } from './views/Me'
 import { btnPrimary } from './components/buttons'
 
@@ -27,6 +27,9 @@ function tabFromHash(): Tab {
 function Shell({ kb }: { kb: Kb }) {
   const { state, updateSettings } = useProgress()
   const [tab, setTab] = useState<Tab>(tabFromHash)
+  const [homeView, setHomeView] = useState<HomeView>(null)
+  // A drill is a quick look at one kind of item: it is not saved as the scope to continue from.
+  const [drill, setDrill] = useState<Scope | null>(null)
   const { firstLaunch, examDate, theme, animations, scope } = state.settings
   const today = new Date().toDateString()
 
@@ -40,6 +43,11 @@ function Shell({ kb }: { kb: Kb }) {
   useEffect(() => applyTheme(theme), [theme])
   useEffect(() => applyAnimations(animations), [animations])
 
+  // Home remembers its page only across a study session; other tabs bring it back to the grid.
+  useEffect(() => {
+    if (tab !== 'home' && tab !== 'feed') setHomeView(null)
+  }, [tab])
+
   useEffect(() => {
     const onHash = () => setTab(tabFromHash())
     window.addEventListener('hashchange', onHash)
@@ -47,27 +55,40 @@ function Shell({ kb }: { kb: Kb }) {
   }, [])
 
   const changeTab = (t: Tab) => {
-    if (t === tab) return
+    if (t === tab) {
+      if (t === 'home') setHomeView(null)
+      return
+    }
     window.history.replaceState(null, '', t === 'home' ? window.location.pathname : `#${t}`)
     setTab(t)
   }
 
   const pick = (s: Scope) => {
-    void updateSettings({ scope: s })
+    if (s.kind === 'drill') setDrill(s)
+    else {
+      setDrill(null)
+      void updateSettings({ scope: s })
+    }
     changeTab('feed')
   }
 
+  const closeFeed = () => {
+    setDrill(null)
+    changeTab('home')
+  }
+
+  const feedScope = drill ?? scope
   // Studying is full screen: the nav steps aside until the feed is closed.
-  const studying = tab === 'feed' && scope !== null
+  const studying = tab === 'feed' && feedScope !== null
 
   return (
     <ConceptSheetProvider kb={kb}>
       <div className="flex h-full flex-col desk:flex-row-reverse">
         <main className={`${studying ? 'app-main-full' : 'app-main'} mx-auto w-full desk:min-w-0 desk:flex-1`} id="main">
           <div hidden={tab !== 'feed'} className="h-full">
-            <Feed key={scope ? scopeKey(scope) : 'none'} kb={kb} scope={scope} visible={tab === 'feed'} onPick={pick} onHome={() => changeTab('home')} />
+            <Feed key={feedScope ? scopeKey(feedScope) : 'none'} kb={kb} scope={feedScope} visible={tab === 'feed'} onPick={pick} onHome={closeFeed} />
           </div>
-          {tab === 'home' && <Home kb={kb} plan={plan} onPick={pick} />}
+          {tab === 'home' && <Home kb={kb} plan={plan} view={homeView} onView={setHomeView} onPick={pick} />}
           {tab === 'coverage' && <Coverage kb={kb} plan={plan} onPick={pick} />}
           {tab === 'browse' && <Browse kb={kb} />}
           {tab === 'me' && <Me kb={kb} />}

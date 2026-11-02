@@ -7,6 +7,18 @@ export type Scope =
   | { kind: 'domain-mix'; domain: number }
   | { kind: 'objective'; objective: string }
   | { kind: 'topic'; topic: string }
+  | { kind: 'drill'; drill: Drill; objective: string }
+
+// One kind of item of an objective, all of it, in reading order.
+export type Drill = 'flashcard' | 'mnemonic' | 'trap' | 'quiz' | 'table'
+
+export const DRILL_LABEL: Record<Drill, string> = {
+  flashcard: 'Flashcards',
+  mnemonic: 'Mnemonics',
+  trap: 'Exam traps',
+  quiz: 'Scenarios',
+  table: 'Tables',
+}
 
 export function scopeKey(s: Scope): string {
   switch (s.kind) {
@@ -21,6 +33,8 @@ export function scopeKey(s: Scope): string {
       return `o${s.objective}`
     case 'topic':
       return `t${s.topic}`
+    case 'drill':
+      return `x${s.drill}${s.objective}`
   }
 }
 
@@ -38,6 +52,8 @@ export function scopeLabel(s: Scope): string {
       return s.objective
     case 'topic':
       return s.topic
+    case 'drill':
+      return `${s.objective} · ${DRILL_LABEL[s.drill]}`
   }
 }
 
@@ -53,6 +69,7 @@ export function conceptInScope(s: Scope, c: Concept): boolean {
     case 'domain-mix':
       return c.domain === s.domain
     case 'objective':
+    case 'drill':
       return c.objective === s.objective
     case 'topic':
       return c.topic === s.topic
@@ -69,6 +86,7 @@ export function questionInScope(s: Scope, q: Question): boolean {
     case 'domain-mix':
       return q.domain === s.domain
     case 'objective':
+    case 'drill':
       return q.objective === s.objective
     case 'topic':
       return q.objective === objectiveOfTopic(s.topic)
@@ -85,6 +103,7 @@ export function tableInScope(s: Scope, t: KbTable): boolean {
     case 'domain-mix':
       return t.domain === s.domain
     case 'objective':
+    case 'drill':
       return t.objective === s.objective
     case 'topic':
       return t.objective === objectiveOfTopic(s.topic)
@@ -97,7 +116,7 @@ export function scopeConcepts(kb: Kb, s: Scope): Concept[] {
 
 export function scopeTitle(kb: Kb, s: Scope): string {
   if (s.kind === 'domain' || s.kind === 'domain-mix') return kb.outline.domains.find((d) => d.number === s.domain)?.title ?? ''
-  if (s.kind === 'objective') {
+  if (s.kind === 'objective' || s.kind === 'drill') {
     for (const d of kb.outline.domains) for (const o of d.objectives) if (o.id === s.objective) return o.title
   }
   if (s.kind === 'topic') {

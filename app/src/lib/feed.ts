@@ -1,5 +1,5 @@
 import type { Concept, Flashcard, Kb, Priority } from '../kb/types'
-import { conceptInScope, questionInScope, tableInScope, type Scope } from './scope'
+import { conceptInScope, questionInScope, tableInScope, type Drill, type Scope } from './scope'
 import { domainStats, weakness, type ProgressSnapshot } from './stats'
 
 export type FeedKind = 'story' | 'flashcard' | 'quiz' | 'table' | 'mnemonic' | 'trap'
@@ -8,7 +8,6 @@ export interface FeedItem {
   key: string // `${kind}:${id}`, unique within a batch
   kind: FeedKind
   id: string // concept id for story/mnemonic/trap, otherwise the item id
-  recap?: boolean // flashcard shown again in its chapter recap
 }
 
 export interface FeedInput {
@@ -33,15 +32,31 @@ const QUIZ_EVERY = 5
 const EXTRA_EVERY = 7
 const CARDS_AFTER_STORY = 2
 const CARD_DELAY = 2
-const SHOWN_PENALTY = 0.3
 
 const PRIORITY_RANK: Record<Priority, number> = { core: 0, important: 1, nice: 2 }
 const PRIORITY_WEIGHT: Record<Priority, number> = { core: 3, important: 2, nice: 1 }
 
 export const itemKey = (kind: FeedKind, id: string) => `${kind}:${id}`
 const item = (kind: FeedKind, id: string): FeedItem => ({ key: itemKey(kind, id), kind, id })
-const recapKey = (id: string) => `${itemKey('flashcard', id)}#recap`
-const recapItem = (id: string): FeedItem => ({ key: recapKey(id), kind: 'flashcard', id, recap: true })
+
+const byReadingOrder = (a: Concept, b: Concept) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]
+
+// Every item of one kind in an objective, in the order its concepts are read.
+export function drillItems(kb: Kb, objective: string, drill: Drill): FeedItem[] {
+  const concepts = kb.concepts.filter((c) => c.objective === objective).sort(byReadingOrder)
+  switch (drill) {
+    case 'flashcard':
+      return concepts.flatMap((c) => (kb.flashcardsByConcept.get(c.id) ?? []).map((fc) => item('flashcard', fc.id)))
+    case 'mnemonic':
+      return concepts.filter((c) => c.mnemonic).map((c) => item('mnemonic', c.id))
+    case 'trap':
+      return concepts.filter((c) => c.traps?.length).map((c) => item('trap', c.id))
+    case 'quiz':
+      return kb.questions.filter((q) => q.objective === objective).map((q) => item('quiz', q.id))
+    case 'table':
+      return kb.tables.filter((t) => t.objective === objective).map((t) => item('table', t.id))
+  }
+}
 
 function rngFrom(seed: number): () => number {
   let a = seed >>> 0
@@ -111,16 +126,22 @@ export function buildBatch(input: FeedInput): Batch {
     return { items, exhausted: due.length <= size }
   }
 
+  if (scope.kind === 'drill') {
+    const left = drillItems(kb, scope.objective, scope.drill).filter((i) => !shown.has(i.key))
+    return { items: left.slice(0, size), exhausted: left.length <= size }
+  }
+
   const stats = domainStats(kb, progress)
   const examWeight = new Map(kb.outline.domains.map((d) => [d.number, d.weight]))
   const domainWeight = (d: number) => (examWeight.get(d) ?? 1) * weakness(stats.get(d))
-  const shownFactor = (key: string) => (shown.has(key) ? SHOWN_PENALTY : 1)
+  // Every card, quiz, recall and table shows at most once per session; the objective's drills are there to see them again.
+  const fresh = (key: string) => free(key) && !shown.has(key)
   const objOrder = (o: string) => kb.objectiveOrder.get(o) ?? 9999
   const scopeConceptIds = new Set(kb.concepts.filter((c) => conceptInScope(scope, c)).map((c) => c.id))
   const inScopeCard = (fc: Flashcard) => scope.kind === 'mix' || scopeConceptIds.has(fc.conceptId)
 
   // (a) Due flashcards of the scope, most overdue first, capped so reading stays the main thread.
-  // A card already shown this session waits for its chapter recap instead of coming back as due.
+  // A card already shown this session does not come back as due.
   const due = kb.flashcards
     .filter((fc) => inScopeCard(fc) && isDue(fc) && !shown.has(itemKey('flashcard', fc.id)))
     .sort(byDue)
@@ -131,8 +152,7 @@ export function buildBatch(input: FeedInput): Batch {
   const unread = kb.concepts.filter(
     (c) => scopeConceptIds.has(c.id) && !progress.read.has(c.id) && !shown.has(itemKey('story', c.id)),
   )
-  const outlineOrder = (a: Concept, b: Concept) =>
-    objOrder(a.objective) - objOrder(b.objective) || PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]
+  const outlineOrder = (a: Concept, b: Concept) => objOrder(a.objective) - objOrder(b.objective) || byReadingOrder(a, b)
   let stories: Concept[]
   if (scope.kind === 'domain-mix') {
     // Shuffle across objectives: core concepts and weak objectives come up more often.
@@ -172,11 +192,11 @@ export function buildBatch(input: FeedInput): Batch {
   for (const a of progress.attempts) lastAttempt.set(a.questionId, a.correct)
   const pickQuiz = (): FeedItem | undefined => {
     const q = pickWeighted(
-      kb.questions.filter((q) => questionInScope(scope, q) && q.conceptIds.every(known) && free(itemKey('quiz', q.id))),
+      kb.questions.filter((q) => questionInScope(scope, q) && q.conceptIds.every(known) && fresh(itemKey('quiz', q.id))),
       (q) => {
         const last = lastAttempt.get(q.id)
         const status = last === undefined ? 1.5 : last ? 0.4 : 2
-        return domainWeight(q.domain) * status * shownFactor(itemKey('quiz', q.id))
+        return domainWeight(q.domain) * status
       },
       rng,
     )
@@ -187,8 +207,8 @@ export function buildBatch(input: FeedInput): Batch {
   let extraTurn = rng() < 0.5 ? 0 : 1
   const pickTable = (): FeedItem | undefined => {
     const t = pickWeighted(
-      kb.tables.filter((t) => tableInScope(scope, t) && free(itemKey('table', t.id))),
-      (t) => PRIORITY_WEIGHT[t.priority] * shownFactor(itemKey('table', t.id)),
+      kb.tables.filter((t) => tableInScope(scope, t) && fresh(itemKey('table', t.id))),
+      (t) => PRIORITY_WEIGHT[t.priority],
       rng,
     )
     return t && item('table', t.id)
@@ -201,8 +221,8 @@ export function buildBatch(input: FeedInput): Batch {
       if (c.traps?.length) options.push(item('trap', c.id))
     }
     return pickWeighted(
-      options.filter((o) => free(o.key)),
-      (o) => PRIORITY_WEIGHT[kb.conceptById.get(o.id)!.priority] * shownFactor(o.key),
+      options.filter((o) => fresh(o.key)),
+      (o) => PRIORITY_WEIGHT[kb.conceptById.get(o.id)!.priority],
       rng,
     )
   }
@@ -212,7 +232,6 @@ export function buildBatch(input: FeedInput): Batch {
   }
 
   // Filler: unreviewed cards of known concepts, then early practice of cards due soonest.
-  const preferUnshown = (items: FeedItem[]) => [...items.filter((i) => !shown.has(i.key)), ...items.filter((i) => shown.has(i.key))]
   const pickFiller = (): FeedItem | undefined => {
     const unreviewed = kb.flashcards
       .filter((fc) => inScopeCard(fc) && !progress.cards.has(fc.id) && known(fc.conceptId) && !pendingIds.has(fc.id))
@@ -221,11 +240,7 @@ export function buildBatch(input: FeedInput): Batch {
       .filter((fc) => inScopeCard(fc) && progress.cards.has(fc.id))
       .sort(byDue)
       .map((fc) => item('flashcard', fc.id))
-    for (const list of [unreviewed, ahead]) {
-      const hit = preferUnshown(list).find((i) => free(i.key))
-      if (hit) return hit
-    }
-    return undefined
+    return [...unreviewed, ...ahead].find((i) => fresh(i.key))
   }
 
   let dueTaken = 0
@@ -272,58 +287,9 @@ export function buildBatch(input: FeedInput): Batch {
       })
   }
 
-  // (e) Chapter recap: once an objective has no concept left to introduce, the cards met with
-  // its stories this session come back once, in the order they were first shown.
-  const objectiveOf = (fc: Flashcard) => kb.conceptById.get(fc.conceptId)?.objective
-  const seen = (key: string) => shown.has(key) || used.has(key)
-  const recapCards = (objective: string): string[] => {
-    const order = [...shown, ...out.map((i) => i.key)]
-    return kb.flashcards
-      .filter(
-        (fc) =>
-          objectiveOf(fc) === objective &&
-          seen(itemKey('story', fc.conceptId)) &&
-          seen(itemKey('flashcard', fc.id)) &&
-          !seen(recapKey(fc.id)),
-      )
-      .sort((a, b) => order.indexOf(itemKey('flashcard', a.id)) - order.indexOf(itemKey('flashcard', b.id)))
-      .map((fc) => fc.id)
-  }
-  const recapQueue: string[] = []
-  let recapNow: string[] = []
-  const chapterOpen = (objective: string) => stories.some((c) => c.objective === objective)
-  const hasPending = (objective: string) => pending.some((x) => objectiveOf(x.fc) === objective)
-  for (const c of kb.concepts) {
-    const o = c.objective
-    if (!shown.has(itemKey('story', c.id)) || chapterOpen(o) || recapQueue.includes(o)) continue
-    if (hasPending(o) || recapCards(o).length > 0) recapQueue.push(o)
-  }
-  const nextRecap = (): FeedItem | undefined => {
-    while (recapNow.length === 0) {
-      // Wait until the chapter's last story has had its own cards.
-      const i = recapQueue.findIndex((o) => !hasPending(o))
-      if (i === -1) return undefined
-      recapNow = recapCards(recapQueue.splice(i, 1)[0]!)
-    }
-    return recapItem(recapNow.shift()!)
-  }
-  // A queued recap closes its chapter before the next story opens another one.
-  const nextStoryOrRecap = (): FeedItem | undefined => {
-    if (recapQueue.length > 0 || recapNow.length > 0) {
-      const recap = nextRecap()
-      if (recap || recapQueue.length > 0) return recap
-    }
-    const story = nextStory()
-    if (story) {
-      const o = kb.conceptById.get(story.id)!.objective
-      if (!chapterOpen(o)) recapQueue.push(o)
-    }
-    return story
-  }
-
   // Slot order: quiz every 5th, extra every 7th, a story's own cards once their short delay
-  // has passed, due reviews on even slots, then the chapter recap or the next story.
-  // Once the stories and recaps run out the batch ends, so the feed can show its end-of-scope card.
+  // has passed, due reviews on even slots, then the next story.
+  // Once the stories run out the batch ends, so the feed can show its end-of-scope card.
   while (out.length < size) {
     const p = out.length
     const next =
@@ -331,21 +297,20 @@ export function buildBatch(input: FeedInput): Batch {
       ((p + 1) % EXTRA_EVERY === 0 ? pickExtra() : undefined) ??
       nextPending(false) ??
       (p % 2 === 0 ? nextDue() : undefined) ??
-      nextStoryOrRecap() ??
+      nextStory() ??
       nextPending(true) ??
-      nextRecap() ??
       nextDue()
     if (!next || used.has(next.key)) break
     used.add(next.key)
     out.push(next)
   }
 
-  const exhausted = stories.length === 0 && pending.length === 0 && recapQueue.length === 0 && recapNow.length === 0
+  const exhausted = stories.length === 0 && pending.length === 0
   // A scope with nothing unread still offers practice before the end card.
   if (exhausted && out.length < 4) {
     for (const pick of [pickFiller, pickQuiz, pickExtra, pickFiller]) {
       const extra = pick()
-      if (extra && free(extra.key)) {
+      if (extra && fresh(extra.key)) {
         used.add(extra.key)
         out.push(extra)
       }

@@ -1,12 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import type { Kb } from '../kb/types'
 import { btnDomain, btnPrimary, btnSecondary } from '../components/buttons'
-import { Bar } from '../components/Chips'
+import { Bar, Label } from '../components/Chips'
 import { DomainIcon, DomainRing, DomainTile } from '../components/DomainTile'
 import { computeCoverage, nextObjective, pct } from '../lib/coverage'
+import { drillItems } from '../lib/feed'
 import type { Plan } from '../lib/plan'
 import { useProgress } from '../lib/progress'
-import { scopeConcepts, scopeLabel, scopeTitle, type Scope } from '../lib/scope'
+import { DRILL_LABEL, scopeConcepts, scopeLabel, scopeTitle, type Drill, type Scope } from '../lib/scope'
 import { dueCount, streak } from '../lib/stats'
 
 export function StreakBadge() {
@@ -19,20 +20,83 @@ export function StreakBadge() {
   )
 }
 
-export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Scope) => void }) {
+// Where Home is: the domain grid, a domain, or one objective of it. Kept by the shell so closing the feed comes back here.
+export type HomeView = { domain: number; objective?: string } | null
+
+const DRILLS: Drill[] = ['flashcard', 'mnemonic', 'trap', 'quiz', 'table']
+
+export function Home({ kb, plan, view, onView, onPick }: { kb: Kb; plan: Plan; view: HomeView; onView: (v: HomeView) => void; onPick: (s: Scope) => void }) {
   const { state } = useProgress()
-  const [domainView, setDomainView] = useState<number | null>(null)
   const cov = useMemo(() => computeCoverage(kb, state.read, state.cards), [kb, state.read, state.cards])
   const due = dueCount(state.cards, kb, new Date())
   const suggested = nextObjective(kb, cov, plan.focus[0])
   const last = state.settings.scope
 
-  if (domainView !== null) {
-    const d = kb.outline.domains.find((x) => x.number === domainView)!
+  if (view?.objective) {
+    const d = kb.outline.domains.find((x) => x.number === view.domain)!
+    const o = d.objectives.find((x) => x.id === view.objective)!
+    const oc = cov.objectives.get(o.id)!
+    const drills = DRILLS.map((drill) => ({ drill, count: drillItems(kb, o.id, drill).length })).filter((x) => x.count > 0)
+    return (
+      <div className={`d-${d.number} mx-auto flex h-full max-w-5xl flex-col gap-4 overflow-y-auto px-4 py-6 md:px-8`}>
+        <button type="button" onClick={() => onView({ domain: d.number })} className="min-h-11 self-start text-sm font-semibold text-muted hover:text-fg">
+          &larr; Domain {d.number}
+        </button>
+        <header className="tile flex flex-col gap-3 p-5">
+          <p className="text-xs font-bold uppercase tracking-wider text-dc-ink">
+            Domain {d.number} · {o.id}
+          </p>
+          <h1 className="text-3xl leading-tight md:text-4xl">{o.title}</h1>
+          <div className="flex items-center gap-2">
+            <Bar done={oc.concepts.done} total={oc.concepts.total} />
+            <span className="shrink-0 text-xs text-muted">
+              {oc.concepts.done}/{oc.concepts.total} concepts read
+            </span>
+          </div>
+        </header>
+        <button
+          type="button"
+          onClick={() => onPick({ kind: 'objective', objective: o.id })}
+          className="tile flex flex-col gap-1 p-5 text-left md:flex-row md:items-center md:justify-between md:gap-6"
+        >
+          <span className="flex flex-col gap-1">
+            <span className="font-display text-2xl font-medium md:text-3xl">Notes</span>
+            <span className="text-sm text-muted">Concepts in order, with flashcards, mnemonics, traps and scenarios along the way. Each shows up once.</span>
+          </span>
+          <span className="mt-2 shrink-0 text-sm font-bold text-dc-ink md:mt-0 md:text-base">
+            {oc.concepts.done === 0 ? 'Start' : oc.concepts.done === oc.concepts.total ? 'Read again' : 'Continue'} &rarr;
+          </span>
+        </button>
+        {drills.length > 0 && (
+          <section aria-label="Review one kind" className="flex flex-col gap-2">
+            <Label>All of one kind</Label>
+            <ul className="grid list-none grid-cols-2 gap-2 p-0 md:grid-cols-5">
+              {drills.map(({ drill, count }) => (
+                <li key={drill}>
+                  <button
+                    type="button"
+                    onClick={() => onPick({ kind: 'drill', drill, objective: o.id })}
+                    aria-label={`All ${count} ${DRILL_LABEL[drill].toLowerCase()} of ${o.id}`}
+                    className="tile flex min-h-24 w-full flex-col justify-between gap-2 p-4 text-left"
+                  >
+                    <span className="font-display text-3xl font-medium leading-none text-dc-ink">{count}</span>
+                    <span className="text-sm font-bold">{DRILL_LABEL[drill]}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    )
+  }
+
+  if (view) {
+    const d = kb.outline.domains.find((x) => x.number === view.domain)!
     const dc = cov.domains.get(d.number)!
     return (
       <div className={`d-${d.number} mx-auto flex h-full max-w-5xl flex-col gap-4 overflow-y-auto px-4 py-6 md:px-8`}>
-        <button type="button" onClick={() => setDomainView(null)} className="min-h-11 self-start text-sm font-semibold text-muted hover:text-fg">
+        <button type="button" onClick={() => onView(null)} className="min-h-11 self-start text-sm font-semibold text-muted hover:text-fg">
           &larr; All domains
         </button>
         <header className="tile flex items-center gap-4 p-5">
@@ -76,7 +140,7 @@ export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Sco
                 {oc.concepts.total > 0 && (
                   <button
                     type="button"
-                    onClick={() => onPick({ kind: 'objective', objective: o.id })}
+                    onClick={() => onView({ domain: d.number, objective: o.id })}
                     className={`${btnDomain} shrink-0`}
                     aria-label={`Study ${o.id} ${o.title}`}
                   >
@@ -139,7 +203,7 @@ export function Home({ kb, plan, onPick }: { kb: Kb; plan: Plan; onPick: (s: Sco
       <ul className="domain-grid mt-1 grid list-none p-0" aria-label="Domains">
         {kb.outline.domains.map((d) => (
           <li key={d.id}>
-            <DomainTile domain={d.number} title={d.title} value={pct(cov.domains.get(d.number)!.concepts)} onOpen={() => setDomainView(d.number)} />
+            <DomainTile domain={d.number} title={d.title} value={pct(cov.domains.get(d.number)!.concepts)} onOpen={() => onView({ domain: d.number })} />
           </li>
         ))}
       </ul>

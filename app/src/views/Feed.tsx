@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { Kb } from '../kb/types'
 import { FlashcardCard } from '../components/cards/FlashcardCard'
 import { QuizCard } from '../components/cards/QuizCard'
@@ -7,10 +7,10 @@ import { StoryCard } from '../components/cards/StoryCard'
 import { Logo } from '../components/Nav'
 import { TableCard } from '../components/cards/TableCard'
 import { computeCoverage, nextObjective } from '../lib/coverage'
-import { buildBatch, type FeedItem } from '../lib/feed'
+import { buildBatch, drillItems, type FeedItem } from '../lib/feed'
 import { useActiveKeys } from '../lib/keys'
 import { useProgress } from '../lib/progress'
-import { scopeConcepts, scopeLabel, type Scope } from '../lib/scope'
+import { DRILL_LABEL, scopeConcepts, scopeLabel, type Scope } from '../lib/scope'
 import { dueCount } from '../lib/stats'
 import { btnPrimary, btnSecondary } from '../components/buttons'
 
@@ -29,7 +29,7 @@ function FeedCard({ item, kb, active, onDone }: { item: FeedItem; kb: Kb; active
     }
     case 'flashcard': {
       const fc = kb.flashcardById.get(item.id)
-      return fc ? <FlashcardCard card={fc} kb={kb} recap={item.recap} active={active} onDone={onDone} /> : null
+      return fc ? <FlashcardCard card={fc} kb={kb} active={active} onDone={onDone} /> : null
     }
     case 'quiz': {
       const q = kb.questionById.get(item.id)
@@ -45,6 +45,39 @@ function FeedCard({ item, kb, active, onDone }: { item: FeedItem; kb: Kb; active
       return c ? <RecallCard concept={c} kb={kb} kind={item.kind} active={active} /> : null
     }
   }
+}
+
+function EndShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="mx-auto flex h-full w-full max-w-7xl px-3 pb-3 pt-1 md:px-8 md:pb-6">
+      <div className="card d-0 flex w-full flex-col items-center justify-center gap-5 px-6 text-center">{children}</div>
+    </div>
+  )
+}
+
+type DrillScope = Extract<Scope, { kind: 'drill' }>
+
+function DrillEndCard({ kb, scope, onPick, onRestart, onHome }: { kb: Kb; scope: DrillScope; onPick: (s: Scope) => void; onRestart: () => void; onHome: () => void }) {
+  const n = drillItems(kb, scope.objective, scope.drill).length
+  const what = DRILL_LABEL[scope.drill].toLowerCase()
+  return (
+    <EndShell>
+      <h2 className="font-display text-3xl font-medium md:text-5xl">{n === 0 ? `No ${what} in ${scope.objective} yet.` : `All ${n} ${what} of ${scope.objective} done.`}</h2>
+      <div className="flex flex-col items-center gap-3">
+        {n > 0 && (
+          <button type="button" onClick={onRestart} className={btnPrimary}>
+            Go through them again
+          </button>
+        )}
+        <button type="button" onClick={() => onPick({ kind: 'objective', objective: scope.objective })} className={btnSecondary}>
+          Study the notes of {scope.objective}
+        </button>
+        <button type="button" onClick={onHome} className={btnSecondary}>
+          Back to {scope.objective}
+        </button>
+      </div>
+    </EndShell>
+  )
 }
 
 function EndCard({ kb, scope, onPick, onRestart }: { kb: Kb; scope: Scope; onPick: (s: Scope) => void; onRestart: () => void }) {
@@ -68,33 +101,31 @@ function EndCard({ kb, scope, onPick, onRestart }: { kb: Kb; scope: Scope; onPic
         : `You went through ${scopeLabel(scope)}.`
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-7xl px-3 pb-3 pt-1 md:px-8 md:pb-6">
-      <div className="card d-0 flex w-full flex-col items-center justify-center gap-5 px-6 text-center">
-        <h2 className="font-display text-3xl font-medium md:text-5xl">{title}</h2>
+    <EndShell>
+      <h2 className="font-display text-3xl font-medium md:text-5xl">{title}</h2>
+      {scope.kind !== 'due' && unread > 0 && (
+        <p className="text-muted">
+          {unread} concept{unread === 1 ? '' : 's'} not finished yet.
+        </p>
+      )}
+      <div className="flex flex-col items-center gap-3">
         {scope.kind !== 'due' && unread > 0 && (
-          <p className="text-muted">
-            {unread} concept{unread === 1 ? '' : 's'} not finished yet.
-          </p>
+          <button type="button" onClick={onRestart} className={btnSecondary}>
+            Go through the unfinished ones
+          </button>
         )}
-        <div className="flex flex-col items-center gap-3">
-          {scope.kind !== 'due' && unread > 0 && (
-            <button type="button" onClick={onRestart} className={btnSecondary}>
-              Go through the unfinished ones
-            </button>
-          )}
-          {next && (
-            <button type="button" onClick={() => onPick({ kind: 'objective', objective: next.id })} className={btnPrimary}>
-              Next up: {next.id} {next.title.length > 48 ? `${next.title.slice(0, 46)}...` : next.title}
-            </button>
-          )}
-          {scope.kind !== 'due' && due > 0 && (
-            <button type="button" onClick={() => onPick({ kind: 'due' })} className={btnSecondary}>
-              Review {due} due flashcard{due === 1 ? '' : 's'}
-            </button>
-          )}
-        </div>
+        {next && (
+          <button type="button" onClick={() => onPick({ kind: 'objective', objective: next.id })} className={btnPrimary}>
+            Next up: {next.id} {next.title.length > 48 ? `${next.title.slice(0, 46)}...` : next.title}
+          </button>
+        )}
+        {scope.kind !== 'due' && due > 0 && (
+          <button type="button" onClick={() => onPick({ kind: 'due' })} className={btnSecondary}>
+            Review {due} due flashcard{due === 1 ? '' : 's'}
+          </button>
+        )}
       </div>
-    </div>
+    </EndShell>
   )
 }
 
@@ -105,6 +136,8 @@ function ScopeChip({ kb, scope, onClick }: { kb: Kb; scope: Scope; onClick: () =
   let total = 0
   if (scope.kind === 'due') {
     text = `Reviews · ${dueCount(state.cards, kb, new Date())} due`
+  } else if (scope.kind === 'drill') {
+    text = `${scopeLabel(scope)} · ${drillItems(kb, scope.objective, scope.drill).length}`
   } else {
     const concepts = scopeConcepts(kb, scope)
     total = concepts.length
@@ -113,7 +146,7 @@ function ScopeChip({ kb, scope, onClick }: { kb: Kb; scope: Scope; onClick: () =
   }
   let domain = 0
   if (scope.kind === 'domain' || scope.kind === 'domain-mix') domain = scope.domain
-  else if (scope.kind === 'objective') domain = Number(scope.objective.split('.')[0])
+  else if (scope.kind === 'objective' || scope.kind === 'drill') domain = Number(scope.objective.split('.')[0])
   else if (scope.kind === 'topic') domain = Number(scope.topic.split('.')[0])
   return (
     <button
@@ -250,7 +283,11 @@ export function Feed({ kb, scope, visible, onPick, onHome }: { kb: Kb; scope: Sc
         ))}
         {exhausted && (
           <section data-index={slots.length} className="feed-item">
-            <EndCard kb={kb} scope={scope} onPick={onPick} onRestart={restart} />
+            {scope.kind === 'drill' ? (
+              <DrillEndCard kb={kb} scope={scope} onPick={onPick} onRestart={restart} onHome={onHome} />
+            ) : (
+              <EndCard kb={kb} scope={scope} onPick={onPick} onRestart={restart} />
+            )}
           </section>
         )}
       </div>
