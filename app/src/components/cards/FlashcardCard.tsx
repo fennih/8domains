@@ -15,7 +15,19 @@ const TYPE_LABEL = { qa: '', cloze: ' · Fill the gap', compare: ' · Compare' }
 // Long enough to read "Back in 2d" before the feed moves on.
 const ADVANCE_MS = 700
 
-export function FlashcardCard({ card, kb, active, onDone }: { card: Flashcard; kb: Kb; active: boolean; onDone: () => void }) {
+export function FlashcardCard({
+  card,
+  kb,
+  recap,
+  active,
+  onDone,
+}: {
+  card: Flashcard
+  kb: Kb
+  recap?: boolean
+  active: boolean
+  onDone: () => void
+}) {
   const { state, grade } = useProgress()
   const openConcept = useOpenConcept()
   const [flipped, setFlipped] = useState(false)
@@ -71,7 +83,7 @@ export function FlashcardCard({ card, kb, active, onDone }: { card: Flashcard; k
       <div className="flex items-start justify-between gap-4">
         <CardContext kb={kb} domain={domain} objective={concept?.objective} />
         <span className="flex min-w-0 flex-col items-end gap-0.5">
-          <Label>{`${isNew ? 'New card' : 'Review'}${TYPE_LABEL[card.type]}`}</Label>
+          <Label>{`${recap ? 'Chapter recap' : isNew ? 'New card' : 'Review'}${TYPE_LABEL[card.type]}`}</Label>
           {concept && (
             <button type="button" onClick={() => openConcept(concept.id)} className="max-w-full truncate text-right text-[13px] text-muted hover:text-fg md:text-sm">
               {concept.title}
