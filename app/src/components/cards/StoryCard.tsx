@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent } from 'react'
 import { itemSubs, itemText, type Concept, type Kb } from '../../kb/types'
+import { narrationFor, nextRate, pause, playStory, seekStep, setRate, toggle, usePlayer } from '../../lib/audio'
 import { conceptStory, type Screen } from '../../lib/beats'
 import { useActiveKeys } from '../../lib/keys'
 import { highlightColors, type HighlightColor } from '../../lib/markup'
@@ -9,6 +10,7 @@ import { CardContext } from '../Chips'
 import { HighlightLegend } from '../HighlightLegend'
 import { Inline } from '../Inline'
 import { useOpenConcept } from '../openConcept'
+import { LangChip } from '../LangChip'
 import { CardShell } from './CardShell'
 
 const SWIPE_MIN = 40
@@ -81,6 +83,15 @@ function screenText(screen: Screen, reveal: number): string {
 }
 
 const arrowBase = 'inline-flex items-center justify-center font-bold disabled:opacity-40'
+const pill = 'inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-bold'
+
+function PlayIcon({ playing }: { playing: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+      {playing ? <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /> : <path d="M8 5.5v13l10.5-6.5z" />}
+    </svg>
+  )
+}
 
 export function StoryCard({ concept, kb, active, onDone }: { concept: Concept; kb: Kb; active: boolean; onDone: () => void }) {
   const { state, markSeen, markRead, updateSettings } = useProgress()
@@ -92,6 +103,12 @@ export function StoryCard({ concept, kb, active, onDone }: { concept: Concept; k
   const swiped = useRef(false)
   const last = steps.length - 1
   const step = steps[index]!
+
+  // Narration is only offered when the audio was made from exactly these steps.
+  const narration = narrationFor(concept.id)
+  const hasAudio = narration !== undefined && narration.steps.length === steps.length
+  const player = usePlayer()
+  const narrating = player.mode === 'story' && player.conceptId === concept.id
 
   useEffect(() => {
     if (active) markSeen(concept.id)
@@ -115,10 +132,39 @@ export function StoryCard({ concept, kb, active, onDone }: { concept: Concept; k
   const legend = [...legendAt.current].filter(([, s]) => s === step.screen).map(([c]) => c)
 
   // Moving within a list screen reveals or hides one bullet; the screen itself stays mounted.
-  const go = (to: number) => {
+  const show = (to: number) => {
     if (steps[to]!.screen !== step.screen) setDir(to > index ? 'next' : 'prev')
     setIndex(to)
   }
+  // A tap or swipe while narrating moves the voice to the same step.
+  const go = (to: number) => {
+    show(to)
+    if (narrating) seekStep(to)
+  }
+
+  // The voice drives the beats.
+  useEffect(() => {
+    if (narrating && player.step !== index && player.step <= last) show(player.step)
+  }, [narrating, player.step])
+
+  // End of the narration moves the feed on, like the last tap would.
+  const endedSeq = player.ended?.conceptId === concept.id ? player.ended.seq : 0
+  useEffect(() => {
+    if (endedSeq && active && player.mode === 'story') onDone()
+  }, [endedSeq])
+
+  // Listening carries on through the feed: the next story starts by itself, other cards stay silent.
+  useEffect(() => {
+    if (!hasAudio || player.mode !== 'story' || !player.autoplay) return
+    if (active && !(narrating && player.playing)) playStory(concept.id, narrating ? index : 0)
+    if (!active && narrating && player.playing) pause()
+  }, [active, hasAudio, player.mode, player.autoplay])
+
+  const listen = () => {
+    if (narrating) toggle()
+    else playStory(concept.id, index === last ? 0 : index)
+  }
+  const listening = narrating && player.playing
   const next = () => {
     if (index === last) return onDone()
     go(index + 1)
@@ -205,9 +251,34 @@ export function StoryCard({ concept, kb, active, onDone }: { concept: Concept; k
         >
           <CardContext kb={kb} domain={concept.domain} objective={concept.objective} />
         </button>
-        <span className="hidden shrink-0 text-sm text-muted desk:inline" aria-hidden="true">
-          {index + 1} / {steps.length}
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          {hasAudio && <LangChip conceptId={concept.id} className={`${pill} min-w-11 border border-line text-muted hover:text-fg`} />}
+          {hasAudio && narrating && (
+            <button
+              type="button"
+              onClick={() => setRate(nextRate(player.rate))}
+              aria-label={`Narration speed ${player.rate}x, change`}
+              className={`${pill} min-w-11 border border-line text-muted tabular-nums hover:text-fg`}
+            >
+              {player.rate}&times;
+            </button>
+          )}
+          {hasAudio && (
+            <button
+              type="button"
+              onClick={listen}
+              aria-pressed={listening}
+              aria-label={listening ? 'Pause narration' : 'Listen to this story'}
+              className={`${pill} ${listening ? 'bg-accent text-accent-fg' : 'border border-dc-edge text-dc-ink hover:border-dc'}`}
+            >
+              <PlayIcon playing={listening} />
+              <span>{narrating && player.failed ? 'Retry' : listening ? 'Pause' : 'Listen'}</span>
+            </button>
+          )}
+          <span className="hidden text-sm text-muted desk:inline" aria-hidden="true">
+            {index + 1} / {steps.length}
+          </span>
+        </div>
       </header>
 
       <div

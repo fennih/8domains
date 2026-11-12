@@ -29,6 +29,8 @@
       "migrations_dir": "migrations"
     }
   ],
+  // Story narration, uploaded with `make audio-push`. Create once with `wrangler r2 bucket create 8domains-audio`.
+  "r2_buckets": [{ "binding": "AUDIO", "bucket_name": "8domains-audio" }],
   // Secrets, set with `wrangler secret put`: CLERK_SECRET_KEY, CLERK_JWT_KEY, CLERK_WEBHOOK_SIGNING_SECRET.
   "observability": { "enabled": true }
 }

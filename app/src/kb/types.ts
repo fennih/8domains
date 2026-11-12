@@ -1,3 +1,5 @@
+import type { Narration, NarrationLang } from '../lib/audio'
+
 export type Priority = 'core' | 'important' | 'nice'
 
 // A bullet: plain text, or text with sub-bullets.
@@ -100,6 +102,8 @@ export interface Kb {
   tableById: Map<string, KbTable>
   flashcardsByConcept: Map<string, Flashcard[]>
   objectiveOrder: Map<string, number>
+  // Narration per language and concept id; empty when the build has no audio.
+  narration: Partial<Record<NarrationLang, Map<string, Narration>>>
 }
 
 export function flashcardDomain(fc: Flashcard): number {

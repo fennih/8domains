@@ -23,7 +23,11 @@ SECTIONS = {
     "manager view": ("managerView", "text"),
     "traps": ("traps", "list"),
 }
-CONCEPT_FM = {"id", "title", "hook", "objective", "topic", "priority", "related", "flashcards"}
+# `pronounce` only feeds the narration pipeline (audio/); it is not part of the compiled KB.
+CONCEPT_FM = {"id", "title", "hook", "objective", "topic", "priority", "related", "flashcards", "pronounce"}
+AUDIO_FILE = re.compile(r"^[a-z0-9-]+\.[0-9a-f]{12}\.m4a$")
+# English manifests sit in <content>/audio, other narration languages in <content>/audio/<lang>.
+AUDIO_LANGS = ("en", "it")
 LETTERS = "ABCD"
 MARKUP_TOKEN = re.compile(r"\*\*[^*]+?\*\*|`[^`]+`|==(?:[gb]:)?(?:[^=]|=(?!=))+?==|\+\+[^+]+?\+\+")
 MARKUP_CHARS = re.compile(r"\*\*|==|\+\+")
@@ -222,6 +226,50 @@ def cross_check(files: dict[str, dict], outline: dict) -> list[str]:
     return errors
 
 
+def source_hash(c: dict) -> str:
+    # Must match sourceHash() in app/scripts/story-segments.ts: it ties an audio file to the text it narrates.
+    fields = [c["title"], c["hook"], c["summary"], c["keyPoints"], c.get("traps"), c.get("managerView"), c.get("mnemonic")]
+    return hashlib.sha256(json.dumps(fields, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()[:12]
+
+
+def build_audio(files: dict[str, dict]) -> tuple[dict[str, dict[str, dict]], list[str]]:
+    """Narration manifests per language, minus entries whose concept text changed since synthesis."""
+    out: dict[str, dict[str, dict]] = {}
+    warnings: list[str] = []
+    for lang in AUDIO_LANGS:
+        adir = CONTENT / "audio" / ("" if lang == "en" else lang)
+        if adir.exists():
+            entries, w = build_audio_lang(files, adir, lang)
+            if entries:
+                out[lang] = entries
+            warnings += w
+    return out, warnings
+
+
+def build_audio_lang(files: dict[str, dict], adir: Path, lang: str) -> tuple[dict[str, dict], list[str]]:
+    out: dict[str, dict] = {}
+    warnings: list[str] = []
+    for d in range(1, 9):
+        path = adir / f"d{d}.json"
+        if not path.exists():
+            continue
+        concepts = {c["id"]: c for c in files[f"d{d}.json"]["concepts"]}
+        entries = {}
+        for cid, e in json.loads(path.read_text(encoding="utf-8")).items():
+            c = concepts.get(cid)
+            if c is None:
+                warnings.append(f"audio {lang}: {cid} no longer exists")
+            elif e.get("source") != source_hash(c):
+                warnings.append(f"audio {lang}: {cid} text changed since synthesis, narration dropped until `make audio`")
+            elif not AUDIO_FILE.fullmatch(str(e.get("file"))) or not e.get("steps"):
+                warnings.append(f"audio {lang}: {cid} has a malformed entry")
+            else:
+                entries[cid] = {"file": e["file"], "steps": e["steps"]}
+        if entries:
+            out[f"d{d}.json"] = entries
+    return out, warnings
+
+
 def main() -> int:
     outline = json.loads((CONTENT / "outline.json").read_text(encoding="utf-8"))
     validator = Draft202012Validator(json.loads(SCHEMA.read_text()))
@@ -252,6 +300,8 @@ def main() -> int:
     if not errors:
         errors += cross_check(files, outline)
     warnings = [w for doc in files.values() for kind in KINDS for item in doc[kind] for w in density_warnings(item["id"], item)]
+    audio, audio_warnings = build_audio(files) if not errors else ({}, [])
+    warnings += audio_warnings
     if warnings:
         print("\n".join(f"warning: {w}" for w in warnings), file=sys.stderr)
         print(f"{len(warnings)} density warning(s)", file=sys.stderr)
@@ -267,13 +317,27 @@ def main() -> int:
         payload = json.dumps(doc, ensure_ascii=False, separators=(",", ":"))
         digest.update(payload.encode())
         (OUT / name).write_text(payload, encoding="utf-8")
+    # Stale manifests must not survive a rebuild: the app would point at audio for old text.
+    adir = OUT / "audio"
+    if adir.exists():
+        for old in adir.glob("**/*.json"):
+            old.unlink()
+    for lang, per_file in audio.items():
+        for name, entries in per_file.items():
+            (adir / lang).mkdir(parents=True, exist_ok=True)
+            payload = json.dumps(entries, ensure_ascii=False, separators=(",", ":"))
+            digest.update(f"{lang}/{name}".encode() + payload.encode())
+            (adir / lang / name).write_text(payload, encoding="utf-8")
     counts = {
         n: {k: len(doc[k]) for k in ("concepts", "flashcards", "questions", "tables")}
         for n, doc in files.items() if n != "outline.json"
     }
-    (OUT / "index.json").write_text(json.dumps({"version": digest.hexdigest()[:12], "files": counts}, indent=2), encoding="utf-8")
+    index = {"version": digest.hexdigest()[:12], "files": counts, "audio": {lang: sorted(f) for lang, f in audio.items()}}
+    (OUT / "index.json").write_text(json.dumps(index, indent=2), encoding="utf-8")
     for n, c in counts.items():
         print(f"{n:12} {c}")
+    for lang, per_file in audio.items():
+        print(f"audio {lang}     {sum(len(e) for e in per_file.values())} narrated concepts")
     print(f"built kb {digest.hexdigest()[:12]} -> {OUT.relative_to(ROOT)}")
     return 0
 

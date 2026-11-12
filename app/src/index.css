@@ -561,8 +561,26 @@ strong {
 }
 
 .app-main {
-  height: calc(100dvh - var(--nav-h) - env(safe-area-inset-bottom));
+  height: calc(100dvh - var(--nav-h) - var(--player-h, 0px) - env(safe-area-inset-bottom));
   padding-top: env(safe-area-inset-top);
+}
+
+/* Podcast player: fixed above the bottom nav; the main area shrinks by its height while it is open. */
+.has-player {
+  --player-h: 4rem;
+}
+
+.mini-player {
+  left: env(safe-area-inset-left);
+  right: env(safe-area-inset-right);
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+  height: var(--player-h);
+}
+
+.mini-player-full {
+  bottom: 0;
+  height: calc(var(--player-h) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .feed {
@@ -597,13 +615,20 @@ strong {
 }
 
 .app-main-full {
-  height: 100dvh;
+  height: calc(100dvh - var(--player-h, 0px));
   padding-top: env(safe-area-inset-top);
 }
 
 @media (min-width: 75rem) {
   .app-main {
-    height: 100dvh;
+    height: calc(100dvh - var(--player-h, 0px));
+  }
+  .mini-player {
+    left: 240px;
+    bottom: 0;
+  }
+  .mini-player-full {
+    left: 0;
   }
   .nav-bar {
     height: 100dvh;

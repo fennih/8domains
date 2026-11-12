@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ConceptSheetProvider } from './components/ConceptSheet'
+import { MiniPlayer } from './components/MiniPlayer'
 import { HighlightTip } from './components/HighlightTip'
 import { Nav, ROUTES, type Tab } from './components/Nav'
 import { loadKb } from './kb/load'
 import type { Kb } from './kb/types'
 import { parseIsoDate } from './lib/dates'
+import { onNarrationEnd, registerNarration, usePlayer } from './lib/audio'
 import { buildPlan } from './lib/plan'
 import { ProgressProvider, useProgress } from './lib/progress'
 import { scopeKey, type Scope } from './lib/scope'
@@ -25,7 +27,8 @@ function tabFromHash(): Tab {
 }
 
 function Shell({ kb }: { kb: Kb }) {
-  const { state, updateSettings } = useProgress()
+  const { state, updateSettings, markRead } = useProgress()
+  const player = usePlayer()
   const [tab, setTab] = useState<Tab>(tabFromHash)
   const [homeView, setHomeView] = useState<HomeView>(null)
   // A drill is a quick look at one kind of item: it is not saved as the scope to continue from.
@@ -41,6 +44,16 @@ function Shell({ kb }: { kb: Kb }) {
   const due = dueCount(state.cards, kb, new Date())
 
   useEffect(() => applyTheme(theme), [theme])
+
+  useEffect(() => {
+    registerNarration(kb.narration, (id) => {
+      const c = kb.conceptById.get(id)
+      const o = c ? kb.outline.domains.find((d) => d.number === c.domain)?.objectives.find((x) => x.id === c.objective) : undefined
+      return { title: c?.title ?? '', album: o ? `${o.id} ${o.title}` : 'CISSP' }
+    })
+  }, [kb])
+  // A narration heard to the end counts as reading the concept, also with the screen off.
+  useEffect(() => onNarrationEnd(markRead), [markRead])
   useEffect(() => applyAnimations(animations), [animations])
 
   // Home remembers its page only across a study session; other tabs bring it back to the grid.
@@ -83,7 +96,7 @@ function Shell({ kb }: { kb: Kb }) {
 
   return (
     <ConceptSheetProvider kb={kb}>
-      <div className="flex h-full flex-col desk:flex-row-reverse">
+      <div className={`flex h-full flex-col desk:flex-row-reverse ${player.mode === 'queue' ? 'has-player' : ''}`}>
         <main className={`${studying ? 'app-main-full' : 'app-main'} mx-auto w-full desk:min-w-0 desk:flex-1`} id="main">
           <div hidden={tab !== 'feed'} className="h-full">
             <Feed key={feedScope ? scopeKey(feedScope) : 'none'} kb={kb} scope={feedScope} visible={tab === 'feed'} onPick={pick} onHome={closeFeed} />
@@ -94,6 +107,7 @@ function Shell({ kb }: { kb: Kb }) {
           {tab === 'me' && <Me kb={kb} />}
         </main>
         {!studying && <Nav tab={tab} onChange={changeTab} due={due} />}
+        <MiniPlayer kb={kb} full={studying} />
         <HighlightTip />
       </div>
     </ConceptSheetProvider>

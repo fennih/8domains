@@ -25,6 +25,18 @@ make preview   # Worker against dist/, keys in worker/.dev.vars
 
 Needs [bun](https://bun.sh) and [uv](https://docs.astral.sh/uv/). Out of the box the app runs on [`example-content/`](example-content): lorem ipsum in the real format.
 
+Story narration is generated locally with [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M), never in CI:
+
+```sh
+make audio-lexicon   # fails until every acronym has a deliberate pronunciation (<content>/lexicon.yaml)
+make audio-audition  # local page to listen to lexicon entries and engine-guessed words
+make audio ONLY=3.6  # synthesize (whole corpus without ONLY), manifests land in <content>/audio
+make audio-check     # Whisper transcription flags steps that drift from the text
+make audio-push      # upload new files to the R2 bucket
+```
+
+Italian narration reads the scripts in `<content>/narration/it/` with [OmniVoice](https://huggingface.co/mlx-community/OmniVoice-bfloat16) on MLX (its own uv project in `audio/mlx`), in a voice cloned from `<content>/narration/it/voice.wav`: add `AUDIO_LANG=it` to `make audio-lexicon`, `make audio` or `make audio-check` (`REDO=1` drops flagged steps so the next `make audio` redoes them). Manifests land in `<content>/audio/it`; concepts without a current script fall back to English in the app.
+
 ## Content
 
 The study content is not published here. It is still under editorial review: every concept is cross-checked against several study guides and revised as the review goes on, so it is released only inside the app, where there is one reviewed, current version instead of copies going stale.
@@ -36,6 +48,7 @@ app/              React PWA
 landing/          static landing, privacy page, security.txt
 worker/           Cloudflare Worker: assets, session gate, security headers, sync API, D1 migrations
 pipeline/         compiles content into the app's JSON
+audio/            narration: text normalization, Kokoro synthesis, QA
 example-content/  placeholder content in the real format
 ```
 

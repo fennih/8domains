@@ -1,4 +1,5 @@
 import { createClerkClient } from '@clerk/backend'
+import { AUDIO_PATH, serveAudio } from './audio'
 import { respond, withSecurityHeaders } from './http'
 import { handleSync } from './sync'
 import { handleClerkWebhook } from './webhook'
@@ -13,6 +14,8 @@ interface Env {
   CLERK_WEBHOOK_SIGNING_SECRET?: string
   // Progress sync; without the binding the app keeps progress in the browser only.
   DB?: D1Database
+  // Story narration files (R2); without the binding the app shows no Listen button.
+  AUDIO?: R2Bucket
   // Only for forks that run without accounts; must be set explicitly.
   AUTH_DISABLED?: string
 }
@@ -72,7 +75,11 @@ export default {
     if (pathname !== '/app' && !pathname.startsWith('/app/')) return respond('Not found', 404)
 
     const isApi = pathname.startsWith('/app/api/')
-    if (env.AUTH_DISABLED === 'true') return isApi ? respond('Not found', 404) : serveApp(request, env, appCsp(null))
+    const audio = AUDIO_PATH.exec(pathname)?.[1]
+    if (env.AUTH_DISABLED === 'true') {
+      if (isApi) return respond('Not found', 404)
+      return audio ? serveAudio(request, env.AUDIO, audio) : serveApp(request, env, appCsp(null))
+    }
     // The API accepts only a bearer token, never the session cookie, so a cross-site request cannot use it.
     if (isApi && !request.headers.get('Authorization')?.startsWith('Bearer ')) {
       return respond('Unauthorized', 401, { 'Cache-Control': 'no-store' })
@@ -96,6 +103,13 @@ export default {
       if (pathname !== '/app/api/sync' || !env.DB) return respond('Not found', 404)
       return handleSync(request, env.DB, state.toAuth().userId)
     }
+
+    // An <audio> element sends the session cookie but cannot follow Clerk's handshake; the app reloads instead.
+    if (audio) {
+      if (!state.isAuthenticated) return respond('Unauthorized', 401, { 'Cache-Control': 'no-store' })
+      return serveAudio(request, env.AUDIO, audio)
+    }
+    if (pathname.startsWith('/app/audio/')) return respond('Not found', 404, { 'Cache-Control': 'no-store' })
 
     // Clerk refreshes an expired session by bouncing the browser through its Frontend API.
     if (state.status === 'handshake') return respond(null, 307, state.headers)

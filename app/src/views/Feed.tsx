@@ -10,7 +10,8 @@ import { computeCoverage, nextObjective } from '../lib/coverage'
 import { buildBatch, drillItems, type FeedItem } from '../lib/feed'
 import { useActiveKeys } from '../lib/keys'
 import { useProgress } from '../lib/progress'
-import { DRILL_LABEL, scopeConcepts, scopeLabel, type Scope } from '../lib/scope'
+import { hasNarration, playQueue, usePlayer } from '../lib/audio'
+import { DRILL_LABEL, scopeConcepts, scopeLabel, scopeTitle, type Scope } from '../lib/scope'
 import { dueCount } from '../lib/stats'
 import { btnPrimary, btnSecondary } from '../components/buttons'
 
@@ -166,6 +167,34 @@ function ScopeChip({ kb, scope, onClick }: { kb: Kb; scope: Scope; onClick: () =
   )
 }
 
+// Podcast entry: every narrated concept of the scope in syllabus order, starting at the first one not read yet.
+function ListenScope({ kb, scope }: { kb: Kb; scope: Scope }) {
+  const { state } = useProgress()
+  const player = usePlayer()
+  const ids = useMemo(() => {
+    const concepts = scope.kind === 'due' ? [] : scopeConcepts(kb, scope).filter((c) => hasNarration(c.id))
+    const order = (id: string) => kb.objectiveOrder.get(kb.conceptById.get(id)?.objective ?? '') ?? 0
+    return concepts.map((c) => c.id).sort((a, b) => order(a) - order(b))
+  }, [kb, scope])
+  if (ids.length === 0) return null
+  const active = player.mode === 'queue' && player.queueTitle === scopeTitle(kb, scope)
+  const start = Math.max(0, ids.findIndex((id) => !state.read.has(id)))
+  return (
+    <button
+      type="button"
+      onClick={() => playQueue(ids, scopeTitle(kb, scope), start)}
+      disabled={active}
+      aria-label={`Listen to ${ids.length} narrated concepts in this scope`}
+      className="inline-flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold text-muted hover:text-fg disabled:opacity-50 desk:border desk:border-line desk:px-3.5"
+    >
+      <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M4 14v-2a8 8 0 0 1 16 0v2M4 14h3v6H5a1 1 0 0 1-1-1zM20 14h-3v6h2a1 1 0 0 0 1-1z" />
+      </svg>
+      <span className="hidden sm:inline">Listen</span>
+    </button>
+  )
+}
+
 export function Feed({ kb, scope, visible, onPick, onHome }: { kb: Kb; scope: Scope | null; visible: boolean; onPick: (s: Scope) => void; onHome: () => void }) {
   const { state } = useProgress()
   const [slots, setSlots] = useState<Slot[]>([])
@@ -263,11 +292,13 @@ export function Feed({ kb, scope, visible, onPick, onHome }: { kb: Kb; scope: Sc
       <div className="mx-auto flex w-full max-w-7xl shrink-0 items-center gap-3 px-3 py-1.5 md:px-8 desk:px-10 desk:pt-4">
         <Logo className="hidden text-xl desk:block" />
         <ScopeChip kb={kb} scope={scope} onClick={onHome} />
+        <div className="ml-auto" />
+        <ListenScope kb={kb} scope={scope} />
         <button
           type="button"
           onClick={onHome}
           aria-label="Close story"
-          className="ml-auto inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[10px] text-sm font-bold text-muted hover:text-fg desk:border desk:border-line desk:px-3.5"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[10px] text-sm font-bold text-muted hover:text-fg desk:border desk:border-line desk:px-3.5"
         >
           <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
             <path d="M6 6l12 12M18 6L6 18" />

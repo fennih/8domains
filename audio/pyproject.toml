@@ -1,0 +1,19 @@
+[project]
+name = "8domains-audio"
+version = "0.1.0"
+# kokoro and misaki support Python 3.10-3.12 only.
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "kokoro>=0.9.4",
+    "misaki[en]>=0.9.4",
+    "soundfile>=0.13",
+    "pyyaml>=6.0",
+    "numpy",
+]
+
+[dependency-groups]
+check = ["mlx-whisper>=0.4"]
+
+[tool.uv]
+package = false
+exclude-newer = "7 days"

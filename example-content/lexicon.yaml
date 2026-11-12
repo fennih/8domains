@@ -1,0 +1,5 @@
+# Pronunciation lexicon for narration (see audio/speech.py). The placeholder content has no acronyms.
+spell: []
+keep: []
+lower: []
+say: {}
